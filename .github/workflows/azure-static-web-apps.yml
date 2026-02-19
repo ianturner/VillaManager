@@ -29,4 +29,4 @@ jobs:
           api_location: ""
           output_location: ""
         env:
-            NEXT_PUBLIC_API_BASE_URL: "https://villamanager-api-csh7ekdkg2febna8ukwest-01.azurewebsites.net"
+            NEXT_PUBLIC_API_BASE_URL: "https://villamanager-api-csh7ekdkg2febna8.ukwest-01.azurewebsites.net"
