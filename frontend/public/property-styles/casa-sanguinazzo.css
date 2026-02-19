@@ -1,0 +1,85 @@
+@font-face {
+  font-family: "BetanyOasis";
+  src: url("/fonts/BetanyOasisItalic-zrpn0.otf") format("opentype");
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: "Cervino";
+  src: url("/fonts/Cervino-LightNeue.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.property-theme-casa-sanguinazzo {
+  font-family: "Cervino", sans-serif;
+}
+
+/* override default styling elements having no value here */
+.property-theme-casa-sanguinazzo h1,
+.property-theme-casa-sanguinazzo h2,
+.property-theme-casa-sanguinazzo h3 {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.property-theme-casa-sanguinazzo h1,
+.property-theme-casa-sanguinazzo h2 {
+  font-family: "Cervino", sans-serif;
+  text-transform: uppercase;
+  text-shadow: var(--text-shadow);
+  color: var(--accent);
+  filter: brightness(90%);
+}
+
+.property-theme-casa-sanguinazzo h1 { font-size: 3rem; }
+.property-theme-casa-sanguinazzo h2 { font-size: 2.75rem; }
+
+.property-theme-casa-sanguinazzo h3,
+.property-theme-casa-sanguinazzo h4,
+.property-theme-casa-sanguinazzo h5,
+.property-theme-casa-sanguinazzo h6 {
+  font-family: "BetanyOasis", sans-serif;
+  text-transform: none;
+  text-shadow: var(--text-shadow);
+  color: var(--accent);
+  filter: brightness(70%);
+}
+
+.property-theme-casa-sanguinazzo .admin-field span {
+  font-family: "Cervino", sans-serif;
+  text-shadow: var(--text-shadow);
+  color: var(--accent);
+  filter: brightness(70%);
+}
+
+.property-theme-casa-sanguinazzo h3 { font-size: 2.5rem; }
+.property-theme-casa-sanguinazzo h4 { font-size: 2.75rem; }
+.property-theme-casa-sanguinazzo h5 { font-size: 2rem; }
+.property-theme-casa-sanguinazzo h6 { font-size: 1.75rem; }
+
+.property-theme-casa-sanguinazzo h1 > *,
+.property-theme-casa-sanguinazzo h2 > *,
+.property-theme-casa-sanguinazzo h3 > *, 
+.property-theme-casa-sanguinazzo h4 > *, 
+.property-theme-casa-sanguinazzo h5 > *, 
+.property-theme-casa-sanguinazzo h6 > * {
+  font-family: "Cervino", sans-serif;
+  font-size: 75%;
+}
+
+.property-theme-casa-sanguinazzo .facility-section h3 {
+  font-size: 2.5rem;
+}
+
+.property-theme-casa-sanguinazzo p,
+.property-theme-casa-sanguinazzo label,
+.property-theme-casa-sanguinazzo .admin-field {
+    font-size: 1.8em;
+}
+
+.property-theme-casa-sanguinazzo .hero-banner,
+.property-theme-casa-sanguinazzo .card {
+  border-radius: 18px!important;
+}

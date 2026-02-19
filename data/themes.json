@@ -1,0 +1,492 @@
+[
+  {
+    "Name": "janoula",
+    "DisplayName": "Janoula",
+    "IsPrivate": false,
+    "CreatedBy": null,
+    "DefaultMode": "light",
+    "Light": {
+      "Background": "#f5f7fa",
+      "Surface": "#fbfcfd",
+      "Text": "#34536f",
+      "Muted": "#8f9fae",
+      "Primary": "#1d9537",
+      "Accent": "#0ea5e9",
+      "Border": "#bebfc1",
+      "Shadow": "0 10px 30px rgba(15, 23, 42, 0.08)",
+      "TextShadow": ""
+    },
+    "Dark": {
+      "Background": "#36393a",
+      "Surface": "#495255",
+      "Text": "#f9fafb",
+      "Muted": "#9ca3af",
+      "Primary": "#1d9537",
+      "Accent": "#38bdf8",
+      "Border": "#708199",
+      "Shadow": "0 10px 30px rgba(0, 0, 0, 0.35)",
+      "TextShadow": ""
+    },
+    "Fonts": {
+      "Base": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Title": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "700",
+        "Style": "normal"
+      },
+      "Subtitle": {
+        "Family": "Sign Painter",
+        "Src": "/fonts/SignPainter.ttc",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      }
+    },
+    "HeadingSizes": {
+      "H1": "4rem",
+      "H2": "3.5rem",
+      "H3": "3rem",
+      "H4": "3rem",
+      "H5": "2rem",
+      "H6": "1.75rem"
+    },
+    "HeadingTransforms": {
+      "H1": "capitalize",
+      "H2": "capitalize",
+      "H3": "capitalize",
+      "H4": "none",
+      "H5": "none",
+      "H6": "none"
+    },
+    "BodyTextSize": "16px",
+    "CornerRadius": "20px"
+  },
+  {
+    "Name": "casa-sanguinazzo",
+    "DisplayName": "Casa Sanguinazzo",
+    "IsPrivate": true,
+    "CreatedBy": "dimitris",
+    "DefaultMode": "light",
+    "Light": {
+      "Background": "#f7f5f3",
+      "Surface": "#f1efee",
+      "Text": "#2b2a28",
+      "Muted": "#6b6258",
+      "Primary": "#1d9537",
+      "Accent": "#765a0f",
+      "Border": "#e6ddd1",
+      "Shadow": "0 12px 28px rgba(34, 27, 20, 0.12)",
+      "TextShadow": "0 2px 10px rgba(34, 27, 20, 0.25)"
+    },
+    "Dark": {
+      "Background": "#15120f",
+      "Surface": "#1d1915",
+      "Text": "#f8f3ed",
+      "Muted": "#b3a79a",
+      "Primary": "#1d9537",
+      "Accent": "#c2ab6d",
+      "Border": "#2a241d",
+      "Shadow": "0 12px 28px rgba(0, 0, 0, 0.45)",
+      "TextShadow": "0 2px 12px rgba(0, 0, 0, 0.5)"
+    },
+    "Fonts": {
+      "Base": {
+        "Family": "Cervino",
+        "Src": "/fonts/Cervino-LightNeue.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Title": {
+        "Family": "Cervino",
+        "Src": "/fonts/Cervino-LightNeue.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Subtitle": {
+        "Family": "BetanyOasis",
+        "Src": "/fonts/BetanyOasisItalic-zrpn0.otf",
+        "Format": "opentype",
+        "Weight": "normal",
+        "Style": "italic"
+      }
+    },
+    "HeadingSizes": {
+      "H1": "3rem",
+      "H2": "2.75rem",
+      "H3": "2.5rem",
+      "H4": "2.25rem",
+      "H5": "2rem",
+      "H6": "1.75rem"
+    },
+    "HeadingTransforms": {
+      "H1": "uppercase",
+      "H2": "uppercase",
+      "H3": "uppercase",
+      "H4": "none",
+      "H5": "none",
+      "H6": "none"
+    },
+    "BodyTextSize": "18px",
+    "CornerRadius": "18px"
+  },
+  {
+    "Name": "lemoni",
+    "DisplayName": "Lemoni",
+    "IsPrivate": false,
+    "CreatedBy": "ianaturner@gmail.com",
+    "DefaultMode": "light",
+    "Light": {
+      "Background": "#f5f7fa",
+      "Surface": "#f4f4eb",
+      "Text": "#1f2933",
+      "Muted": "#52606d",
+      "Primary": "#7eaf23",
+      "Accent": "#c6c90d",
+      "Border": "#e5e7eb",
+      "Shadow": "0 10px 30px rgba(15, 23, 42, 0.08)",
+      "TextShadow": "none"
+    },
+    "Dark": {
+      "Background": "#474a17",
+      "Surface": "#6a6634",
+      "Text": "#f9fafb",
+      "Muted": "#b0ae9c",
+      "Primary": "#1d9537",
+      "Accent": "#f9ec39",
+      "Border": "#68693a",
+      "Shadow": "0 10px 30px rgba(0, 0, 0, 0.35)",
+      "TextShadow": "none"
+    },
+    "Fonts": {
+      "Base": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Title": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Subtitle": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      }
+    },
+    "HeadingSizes": {
+      "H1": "3rem",
+      "H2": "2.75rem",
+      "H3": "2.5rem",
+      "H4": "2.25rem",
+      "H5": "2rem",
+      "H6": "1.75rem"
+    },
+    "HeadingTransforms": {
+      "H1": "uppercase",
+      "H2": "uppercase",
+      "H3": "uppercase",
+      "H4": "none",
+      "H5": "none",
+      "H6": "none"
+    },
+    "BodyTextSize": "16px",
+    "CornerRadius": "18px"
+  },
+  {
+    "Name": "mandarini",
+    "DisplayName": "Mandarini",
+    "IsPrivate": false,
+    "CreatedBy": null,
+    "DefaultMode": "light",
+    "Light": {
+      "Background": "#fcfaf8",
+      "Surface": "#ead7bd",
+      "Text": "#1f2933",
+      "Muted": "#52606d",
+      "Primary": "#1d9537",
+      "Accent": "#e7820d",
+      "Border": "#ebdcc6",
+      "Shadow": "0 10px 30px rgba(15, 23, 42, 0.08)",
+      "TextShadow": "none"
+    },
+    "Dark": {
+      "Background": "#1e160a",
+      "Surface": "#412401",
+      "Text": "#f9fafb",
+      "Muted": "#b0a49c",
+      "Primary": "#71951d",
+      "Accent": "#f99639",
+      "Border": "#8a4300",
+      "Shadow": "0 10px 30px rgba(0, 0, 0, 0.35)",
+      "TextShadow": "none"
+    },
+    "Fonts": {
+      "Base": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Title": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Subtitle": {
+        "Family": "Calibril",
+        "Src": "/fonts/Calibril.ttf",
+        "Format": "truetype",
+        "Weight": "300",
+        "Style": "normal"
+      }
+    },
+    "HeadingSizes": {
+      "H1": "3rem",
+      "H2": "2.75rem",
+      "H3": "2.5rem",
+      "H4": "2.25rem",
+      "H5": "2rem",
+      "H6": "1.75rem"
+    },
+    "HeadingTransforms": {
+      "H1": "uppercase",
+      "H2": "capitalize",
+      "H3": "capitalize",
+      "H4": "capitalize",
+      "H5": "none",
+      "H6": "none"
+    },
+    "BodyTextSize": "16px",
+    "CornerRadius": "18px"
+  },
+  {
+    "Name": "strawberry-cream",
+    "DisplayName": "Strawberries and Cream",
+    "IsPrivate": false,
+    "CreatedBy": null,
+    "DefaultMode": "light",
+    "Light": {
+      "Background": "#e1dbdb",
+      "Surface": "#fbeff1",
+      "Text": "#1f2933",
+      "Muted": "#52606d",
+      "Primary": "#3d951d",
+      "Accent": "#db4d62",
+      "Border": "#d9abad",
+      "Shadow": "0 10px 30px rgba(15, 23, 42, 0.08)",
+      "TextShadow": "none"
+    },
+    "Dark": {
+      "Background": "#2d1019",
+      "Surface": "#49222e",
+      "Text": "#f9fafb",
+      "Muted": "#9ca3af",
+      "Primary": "#1d9537",
+      "Accent": "#f9395f",
+      "Border": "#a29094",
+      "Shadow": "0 10px 30px rgba(0, 0, 0, 0.35)",
+      "TextShadow": "none"
+    },
+    "Fonts": {
+      "Base": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Title": {
+        "Family": "Avenir Next",
+        "Src": "/fonts/Avenir Next.ttc",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Subtitle": {
+        "Family": "Tomatoes",
+        "Src": "/fonts/Tomatoes-O8L8.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      }
+    },
+    "HeadingSizes": {
+      "H1": "3rem",
+      "H2": "2.6rem",
+      "H3": "2rem",
+      "H4": "2.25rem",
+      "H5": "2rem",
+      "H6": "1.75rem"
+    },
+    "HeadingTransforms": {
+      "H1": "capitalize",
+      "H2": "capitalize",
+      "H3": "capitalize",
+      "H4": "none",
+      "H5": "none",
+      "H6": "none"
+    },
+    "BodyTextSize": "16px",
+    "CornerRadius": "18px"
+  },
+  {
+    "Name": "oreo",
+    "DisplayName": "Oreo",
+    "IsPrivate": false,
+    "CreatedBy": null,
+    "DefaultMode": "light",
+    "Light": {
+      "Background": "#ffffff",
+      "Surface": "#ffffff",
+      "Text": "#5f4126",
+      "Muted": "#6c6251",
+      "Primary": "#1d9537",
+      "Accent": "#633d08",
+      "Border": "#fff9f0",
+      "Shadow": "0 10px 30px rgba(15, 23, 42, 0.08)",
+      "TextShadow": "none"
+    },
+    "Dark": {
+      "Background": "#2f230e",
+      "Surface": "#271e11",
+      "Text": "#f9fafb",
+      "Muted": "#9ca3af",
+      "Primary": "#1d9537",
+      "Accent": "#dac69a",
+      "Border": "#4f473b",
+      "Shadow": "0 10px 30px rgba(0, 0, 0, 0.35)",
+      "TextShadow": "none"
+    },
+    "Fonts": {
+      "Base": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Title": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "normal",
+        "Style": "normal"
+      },
+      "Subtitle": {
+        "Family": "Hardest Style Demo",
+        "Src": "/fonts/Hardest-Style-Demo.woff",
+        "Format": "woff",
+        "Weight": "normal",
+        "Style": "normal"
+      }
+    },
+    "HeadingSizes": {
+      "H1": "3rem",
+      "H2": "2.5rem",
+      "H3": "2.25rem",
+      "H4": "3.5rem",
+      "H5": "3.2rem",
+      "H6": "3rem"
+    },
+    "HeadingTransforms": {
+      "H1": "capitalize",
+      "H2": "capitalize",
+      "H3": "capitalize",
+      "H4": "capitalize",
+      "H5": "",
+      "H6": ""
+    },
+    "BodyTextSize": "14px",
+    "CornerRadius": "20px"
+  },
+  {
+    "Name": "charma",
+    "DisplayName": "Charma",
+    "IsPrivate": true,
+    "CreatedBy": "admin",
+    "DefaultMode": "light",
+    "Light": {
+      "Background": "#ededed",
+      "Surface": "#fdf2f2",
+      "Text": "#9d808e",
+      "Muted": "#b79aaf",
+      "Primary": "#1d9537",
+      "Accent": "#dc1e70",
+      "Border": "#dccbd3",
+      "Shadow": "5px 5px 30px rgba(120, 120, 120, 0.20)",
+      "TextShadow": "2px 3px 3px rgba(35, 35, 35, 0.30)"
+    },
+    "Dark": {
+      "Background": "#413e40",
+      "Surface": "#413e3f",
+      "Text": "#d9d9d9",
+      "Muted": "#ac6c9b",
+      "Primary": "#0c5f1e",
+      "Accent": "#d74785",
+      "Border": "#a2768a",
+      "Shadow": "5px 5px 40px rgba(0, 0, 0, 0.20)",
+      "TextShadow": "2px 3px 3px rgba(0, 0, 0, 0.15)"
+    },
+    "Fonts": {
+      "Base": {
+        "Family": "Calibri",
+        "Src": "/fonts/Calibri.ttf",
+        "Format": "truetype",
+        "Weight": "100",
+        "Style": "normal"
+      },
+      "Title": {
+        "Family": "Cervino",
+        "Src": "/fonts/Cervino-LightNeue.ttf",
+        "Format": "truetype",
+        "Weight": "300",
+        "Style": "normal"
+      },
+      "Subtitle": {
+        "Family": "Calibril",
+        "Src": "/fonts/Calibril.ttf",
+        "Format": "truetype",
+        "Weight": "200",
+        "Style": "normal"
+      }
+    },
+    "HeadingSizes": {
+      "H1": "3rem",
+      "H2": "2.6rem",
+      "H3": "2.1rem",
+      "H4": "2.25rem",
+      "H5": "2rem",
+      "H6": "1.75rem"
+    },
+    "HeadingTransforms": {
+      "H1": "uppercase",
+      "H2": "capitalize",
+      "H3": "capitalize",
+      "H4": "none",
+      "H5": "none",
+      "H6": "none"
+    },
+    "BodyTextSize": "16px",
+    "CornerRadius": "20px"
+  }
+]

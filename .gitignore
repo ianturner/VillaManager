@@ -1,0 +1,48 @@
+.DS_Store
+.env
+.env.*
+.idea/
+.vscode/
+.cursor/
+
+# Next.js / Node
+node_modules/
+frontend/.next/
+out/
+dist/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# .NET
+*.dll
+*.pdb
+*.cache
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+bin/
+obj/
+**/bin/
+**/bin/**
+**/obj/
+**/obj/**
+.vs/
+
+# Deployment secrets (tokens, keys)
+deployment-secrets.env
+
+# Local/private data
+data-private/
+
+# Large media / build output (exceeds GitHub 100MB limit)
+*.m4v
+publish/
+
+# Property data/media — uploaded to Azure Files separately (see Deployment-todo.md Part A & D)
+data/properties/
+data/properties/charma-home/archive/data-archive-*.json
+data/properties/charma-home/archive/data-v*.json

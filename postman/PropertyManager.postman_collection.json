@@ -1,0 +1,985 @@
+{
+  "info": {
+    "name": "PropertyManager API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Properties",
+      "item": [
+        {
+          "name": "Get Rental Property",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Property id matches\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.eql(pm.environment.get(\"propertyIdRental\"));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Sale Property",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdSale}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdSale}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Property id matches\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.id).to.eql(pm.environment.get(\"propertyIdSale\"));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Property PDFs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}/pdfs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}",
+                "pdfs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns array\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(Array.isArray(json)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Property Page Images",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}/pages/interior/images",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}",
+                "pages",
+                "interior",
+                "images"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+        ,
+        {
+          "name": "Get Property Page Data",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}/pages/{{pageName}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}",
+                "pages",
+                "{{pageName}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Page name matches\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.page).to.eql(pm.environment.get(\"pageName\"));",
+                  "});",
+                  "pm.test(\"Returns page payload\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.data).to.be.an(\"object\");",
+                  "  pm.expect(json.data.id).to.eql(pm.environment.get(\"pageName\"));",
+                  "  pm.expect(json.data.title).to.be.a(\"string\");",
+                  "  pm.expect(Array.isArray(json.data.sections)).to.be.true;",
+                  "});",
+                  "pm.test(\"Section ids exist\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const sections = json.data.sections || [];",
+                  "  sections.forEach(section => {",
+                  "    pm.expect(section.id).to.be.a(\"string\");",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+        ,
+        {
+          "name": "Get Property Pages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}/pages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}",
+                "pages"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns array\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(Array.isArray(json)).to.be.true;",
+                  "});",
+                  "pm.test(\"Includes overview\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const ids = json.map(item => item.id);",
+                  "  pm.expect(ids).to.include(\"overview\");",
+                  "});",
+                  "pm.test(\"Includes configured pages\", function () {",
+                  "  const json = pm.response.json();",
+                  "  const ids = json.map(item => item.id);",
+                  "  pm.expect(ids).to.include(pm.environment.get(\"pageName\"));",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "POIs",
+      "item": [
+        {
+          "name": "Get Property POIs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}/poi",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}",
+                "poi"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns array\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(Array.isArray(json)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get POI PDFs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}/poi/{{poiIdRental}}/pdfs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}",
+                "poi",
+                "{{poiIdRental}}",
+                "pdfs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns array\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(Array.isArray(json)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+        ,
+        {
+          "name": "Get POI Images",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/properties/{{propertyIdRental}}/poi/{{poiIdRental}}/images",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "properties",
+                "{{propertyIdRental}}",
+                "poi",
+                "{{poiIdRental}}",
+                "images"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns array\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(Array.isArray(json)).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+    ,
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"owner@example.com\",\n  \"password\": \"secret\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Create Property",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"new_property\",\n  \"name\": \"New Property\",\n  \"status\": \"rental\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/properties",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Property",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Updated summary\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/properties/{{propertyIdRental}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties",
+                "{{propertyIdRental}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Property Images",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/properties/{{propertyIdRental}}/uploads",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties",
+                "{{propertyIdRental}}",
+                "uploads"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create POI",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"new_poi\",\n  \"name\": \"New POI\",\n  \"category\": \"Restaurant\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/properties/{{propertyIdRental}}/poi",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties",
+                "{{propertyIdRental}}",
+                "poi"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload POI Images",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/properties/{{propertyIdRental}}/poi/{{poiIdRental}}/uploads",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties",
+                "{{propertyIdRental}}",
+                "poi",
+                "{{poiIdRental}}",
+                "uploads"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Property PDFs",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/properties/{{propertyIdRental}}/pdfs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties",
+                "{{propertyIdRental}}",
+                "pdfs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload POI PDFs",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/properties/{{propertyIdRental}}/poi/{{poiIdRental}}/pdfs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "properties",
+                "{{propertyIdRental}}",
+                "poi",
+                "{{poiIdRental}}",
+                "pdfs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Create Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"propertyId\": \"{{propertyIdRental}}\",\n  \"toUserId\": \"u_2\",\n  \"subject\": \"Booking request\",\n  \"body\": \"Hello\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/messages",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "messages"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Message Thread",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/messages/thread/prototype-thread",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "messages",
+                "thread",
+                "prototype-thread"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Get Notifications",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Finance",
+      "item": [
+        {
+          "name": "Create Finance Entry",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"cost\",\n  \"amount\": 120.5,\n  \"currency\": \"EUR\",\n  \"date\": \"2026-01-10\",\n  \"description\": \"Plumbing repair\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/finance/{{propertyIdRental}}/entries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "finance",
+                "{{propertyIdRental}}",
+                "entries"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Finance Entries",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/finance/{{propertyIdRental}}/entries",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "finance",
+                "{{propertyIdRental}}",
+                "entries"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Finance Receipts",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/finance/{{propertyIdRental}}/entries/fe_1/receipts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "finance",
+                "{{propertyIdRental}}",
+                "entries",
+                "fe_1",
+                "receipts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 501\", function () {",
+                  "  pm.response.to.have.status(501);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+    ,
+    {
+      "name": "System",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Status payload ok\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.status).to.eql(\"ok\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

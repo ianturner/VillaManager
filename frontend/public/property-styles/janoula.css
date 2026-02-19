@@ -1,0 +1,77 @@
+@font-face {
+  font-family: "AvenirNext";
+  src: url("/fonts/Avenir Next.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Calibri";
+  src: url("/fonts/Calibri.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+.property-theme-janoula {
+  font-family: "Calibri", sans-serif;
+}
+
+/* override default styling elements having no value here */
+.property-theme-janoula h1,
+.property-theme-janoula h2,
+.property-theme-janoula h3 {
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+.property-theme-janoula h1,
+.property-theme-janoula h2 {
+  font-family: "Calibri", sans-serif;
+  text-shadow: var(--text-shadow);
+  color: var(--accent);
+  filter: brightness(90%);
+}
+
+.property-theme-janoula h1 { font-size: 3rem; }
+.property-theme-janoula h2 { font-size: 2.75rem; }
+
+.property-theme-janoula h3,
+.property-theme-janoula h4,
+.property-theme-janoula h5,
+.property-theme-janoula h6,
+.property-theme-janoula .admin-field span {
+  text-shadow: var(--text-shadow);
+  color: var(--accent);
+  filter: brightness(70%);
+}
+
+.property-theme-janoula h3 { font-size: 2.1rem; }
+.property-theme-janoula h4 { font-size: 1.8rem; }
+.property-theme-janoula h5 { font-size: 1.5rem; }
+.property-theme-janoula h6 { font-size: 1.25rem; }
+
+.property-theme-janoula .facility-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 2px;
+}
+
+.property-theme-janoula h1 > *,
+.property-theme-janoula h2 > *,
+.property-theme-janoula h3 > *,
+.property-theme-janoula h4 > *,
+.property-theme-janoula h5 > *,
+.property-theme-janoula h6 > * {
+  font-family: "Calibri", sans-serif;
+  font-size: 75%;
+}
+
+.property-theme-janoula p,
+.property-theme-janoula label,
+.property-theme-janoula .admin-field {
+  font-size: 1.5em;
+}
+
+.property-theme-janoula .hero-banner,
+.property-theme-janoula .card {
+  border-radius: 6px;
+}
