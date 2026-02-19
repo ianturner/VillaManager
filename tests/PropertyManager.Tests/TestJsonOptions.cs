@@ -1,4 +1,5 @@
 using System.Text.Json;
+using PropertyManager.Application.Contracts.Localization;
 
 namespace PropertyManager.Tests;
 
@@ -8,10 +9,11 @@ namespace PropertyManager.Tests;
 public static class TestJsonOptions
 {
     /// <summary>
-    /// Default serializer options (camelCase).
+    /// Default serializer options (camelCase, with LocalizedString support).
     /// </summary>
     public static readonly JsonSerializerOptions Default = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        Converters = { new LocalizedStringJsonConverter() }
     };
 }

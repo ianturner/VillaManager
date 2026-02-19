@@ -1,5 +1,6 @@
 using System.Text.Json;
 using PropertyManager.Application.Contracts;
+using PropertyManager.Application.Contracts.Localization;
 using PropertyManager.Application.Contracts.Responses;
 using Xunit;
 
@@ -16,7 +17,7 @@ public class DtoSerializationTests
         var dto = new PropertyDto
         {
             Id = "villa_janoula",
-            Name = "Villa Janoula",
+            Name = LocalizedString.FromString("Villa Janoula"),
             Status = "rental",
             Version = "20260125130000",
             IsPublished = true,
@@ -24,11 +25,11 @@ public class DtoSerializationTests
             {
                 new PropertyFacilityCategoryDto
                 {
-                    Title = "General",
+                    Title = LocalizedString.FromString("General"),
                     Icon = "solid:wifi",
                     Items = new()
                     {
-                        new PropertyFacilityItemDto { Text = "Wi-Fi" }
+                        new PropertyFacilityItemDto { Text = LocalizedString.FromString("Wi-Fi") }
                     }
                 }
             }
@@ -161,7 +162,7 @@ public class DtoSerializationTests
                 new RentalAvailabilityDto
                 {
                     Year = 2026,
-                    CalendarImage = new ImageDto { Src = "https://cdn.example.com/2026.png", Alt = "Availability 2026" }
+                    CalendarImage = new ImageDto { Src = "https://cdn.example.com/2026.png", Alt = LocalizedString.FromString("Availability 2026") }
                 }
             },
             Bookings = new()
