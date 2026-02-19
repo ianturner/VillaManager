@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserLock } from "@fortawesome/free-solid-svg-icons";
@@ -13,6 +13,14 @@ import { login, storeSession } from "@/lib/adminApi";
 import { useTranslations } from "@/lib/i18n/useLanguage";
 
 export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div className="admin-loading">Loading...</div>}>
+      <AdminLoginPageInner />
+    </Suspense>
+  );
+}
+
+function AdminLoginPageInner() {
   const router = useRouter();
   const { t } = useTranslations();
   const [username, setUsername] = useState("");

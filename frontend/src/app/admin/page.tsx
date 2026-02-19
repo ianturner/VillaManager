@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -171,7 +171,7 @@ function getThemeVars(
   };
 }
 
-export default function AdminPage() {
+function AdminPageContent() {
   const router = useRouter();
   const { setLanguage, t } = useTranslations();
   const searchParams = useSearchParams();
@@ -6481,5 +6481,13 @@ function AdminPageBody({
       )}
       </section>
     </div>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <Suspense fallback={<div className="admin-loading">Loading...</div>}>
+      <AdminPageContent />
+    </Suspense>
   );
 }

@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faPlus, faSave, faSignOutAlt, faTrash, faEye, faEyeSlash, faChevronLeft } from "@fortawesome/free-solid-svg-icons";
@@ -34,7 +34,7 @@ type UserDraft = UserAdminDto & {
   isNew?: boolean;
 };
 
-export default function AdminUsersPage() {
+function AdminUsersPageContent() {
   const router = useRouter();
   const { language, setLanguage, t } = useTranslations();
   const searchParams = useSearchParams();
@@ -653,5 +653,13 @@ export default function AdminUsersPage() {
         )}
       </section>
     </ThemeProvider>
+  );
+}
+
+export default function AdminUsersPage() {
+  return (
+    <Suspense fallback={<div className="admin-loading">Loading...</div>}>
+      <AdminUsersPageContent />
+    </Suspense>
   );
 }

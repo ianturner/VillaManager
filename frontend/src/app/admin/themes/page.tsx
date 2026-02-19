@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -1167,7 +1167,9 @@ function AdminThemesContent() {
 export default function AdminThemesPage() {
   return (
     <ThemeProvider>
-      <AdminThemesContent />
+      <Suspense fallback={<div className="admin-loading">Loading...</div>}>
+        <AdminThemesContent />
+      </Suspense>
     </ThemeProvider>
   );
 }
