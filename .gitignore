@@ -35,6 +35,10 @@ obj/
 # Deployment secrets (tokens, keys)
 deployment-secrets.env
 
+# Local SSH keys (never commit)
+feb26_ssh_key
+feb26_ssh_key.pub
+
 # Local/private data
 data-private/
 
@@ -46,3 +50,15 @@ publish/
 data/properties/
 data/properties/charma-home/archive/data-archive-*.json
 data/properties/charma-home/archive/data-v*.json
+
+# What we did:
+# The push completed successfully and VillaManager is now on GitHub.
+# What you did:
+# Generated an SSH key and added it to your agent
+# Registered the key with GitHub (e.g. as "Feb20206-SSH-key")
+# Switched the remote to SSH and pushed the repo (~5.33 MiB, 224 objects)
+# GitHub showing "Never used" for the key is normal; it can take a bit to update and your push confirms it’s working.
+# Next steps from your deployment guide
+# Part A: Create Azure Storage and upload data
+# Part B: Create and configure the API App Service
+# Part C: Deploy the frontend (via GitHub Actions for the SWA or App Service, now that the repo is on GitHub)

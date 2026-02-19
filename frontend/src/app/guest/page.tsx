@@ -11,6 +11,8 @@ import { getLanguageDirection, isSupportedLanguage, normalizeLanguage, type Lang
 import { findGuestBooking } from "@/lib/guestLink";
 import type { PropertyDto } from "@/lib/types";
 
+export const dynamic = "force-dynamic";
+
 type SearchParams = {
   id?: string;
   lang?: string;

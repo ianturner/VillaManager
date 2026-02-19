@@ -1,8 +1,10 @@
 "use client";
 
+export const dynamic = "force-dynamic";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import type { CSSProperties } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner, faSave, faArchive, faPlus, faTrash, faEye, faEyeSlash, faSignOutAlt, faObjectGroup, faPaperclip, faCalendar, faMoneyBills, faLegal, faUsers, faPaintBrush, faHomeLgAlt, faPlane, faUpload, faRotateLeft, faLink } from "@fortawesome/free-solid-svg-icons";
 import type {

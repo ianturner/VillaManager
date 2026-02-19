@@ -73,6 +73,8 @@ const findGuestBooking = (
   );
 };
 
+export const dynamic = "force-dynamic";
+
 const getGuestLanguage = (booking: ReturnType<typeof findGuestBooking>): LanguageCode | null => {
   if (!booking?.preferredLanguage) {
     return null;
