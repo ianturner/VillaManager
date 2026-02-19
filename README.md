@@ -70,3 +70,4 @@ and the admin UI lookup button will fail.
 - `PropertyDto` no longer exposes `interior`/`exterior`. Use `pages` with flexible
   `PropertyPageDto` + `PropertySectionDto` instead.
 - Prototype `data.json` files now use the `pages` array.
+# test
