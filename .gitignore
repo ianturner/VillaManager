@@ -1,5 +1,7 @@
 .DS_Store
-.env
+frontend/.DS_Store
+frontend/src/.DS_Store
+frontend/src/app/.DS_Store.env
 .env.*
 .idea/
 .vscode/
@@ -62,3 +64,4 @@ data/properties/charma-home/archive/data-v*.json
 # Part A: Create Azure Storage and upload data
 # Part B: Create and configure the API App Service
 # Part C: Deploy the frontend (via GitHub Actions for the SWA or App Service, now that the repo is on GitHub)
+
