@@ -421,14 +421,105 @@ If you haven't already (Step A5):
 
 ## Adding a Custom Domain Later
 
-When you buy a domain (e.g. from Namecheap, GoDaddy, or Azure):
+When you buy a domain (e.g. from Namecheap, GoDaddy, or Azure), you can attach it to your Static Web App and API. This section covers using **Azure DNS** to host your domain.
 
-1. In your App Service or Static Web App, go to **Custom domains**
-2. Click **Add custom domain**
-3. Enter your domain (e.g. `app.yourdomain.com`)
-4. Follow the instructions to add a CNAME or A record in your DNS
-5. Enable the managed certificate (HTTPS)
-6. Update CORS and `NEXT_PUBLIC_API_BASE_URL` to use your new domain
+### Step 1: Create an Azure DNS Zone
+
+1. In the Azure Portal, search for **DNS zones** and click it
+2. Click **+ Create**
+3. Fill in:
+   - **Subscription:** your subscription
+   - **Resource group:** `villa-manager-rg` (same as your other resources)
+   - **Name:** your domain (e.g. `miacasa.studio`)
+4. Click **Review + create**, then **Create**
+5. Go to the new DNS zone → **Overview**
+6. Note the **name servers** (e.g. `ns1-01.azure-dns.com`, `ns2-01.azure-dns.net`, etc.)
+
+### Step 2: Point Your Domain Registrar to Azure Nameservers
+
+1. Log in to your domain registrar (where you purchased the domain)
+2. Find the **Nameservers** or **DNS** settings for your domain
+3. Replace the default nameservers with the four Azure nameservers from Step 1
+4. Save changes — propagation can take up to 48 hours (often much less)
+
+### Step 3: Add the Custom Domain to the Static Web App
+
+1. In Azure Portal, open your **Static Web App** (e.g. `villamanager-app`)
+2. Go to **Custom domains**
+3. Click **+ Add**
+4. Enter your domain (e.g. `miacasa.studio` or `www.miacasa.studio`)
+5. Click **Next**
+6. Azure will show two things you need:
+   - **TXT record** (for domain ownership)
+   - **A/ALIAS record** (for traffic)
+
+### Step 4: Add the TXT Record (Domain Ownership)
+
+1. In the Custom Domain details, under **Validate Domain Ownership**, copy the TXT **Value** (use the copy icon)
+2. In your Azure DNS zone → **Record sets** → **+ Add**
+3. Create a TXT record:
+   - **Name:** `@` (root domain)
+   - **Type:** TXT
+   - **TTL:** 3600
+   - **Value:** paste the exact value from Azure (e.g. `_mi1uoqr3m0whlvknrd9g6opc2wvl6r4`)
+4. Click **Save**
+5. It can take **up to 12 hours** for Azure to validate (often 15–60 minutes). Refresh the Custom domains page periodically.
+
+**Verify TXT propagation:**
+
+```bash
+nslookup -type=TXT yourdomain.com ns1-01.azure-dns.com
+```
+
+Or use [dnschecker.org](https://dnschecker.org) with record type **TXT**. The TXT value in the response should match what Azure generated.
+
+### Step 5: Add the A/ALIAS Record (Traffic)
+
+1. In your Azure DNS zone → **Record sets** → **+ Add**
+2. Create an A record:
+   - **Name:** `@` (for root domain) or `www` (for www subdomain)
+   - **Type:** A
+   - **Alias record set:** Yes
+   - **Alias type:** Azure resource
+   - **Subscription:** your subscription
+   - **Resource type:** Static site
+   - **Resource:** select your Static Web App (e.g. `villamanager-app`)
+3. Click **Save**
+
+**Verify A record propagation:**
+
+```bash
+nslookup yourdomain.com
+```
+
+Or use [dnschecker.org](https://dnschecker.org) with record type **A**. The domain should resolve to Azure's IPs.
+
+### Step 6: Wait for Validation
+
+1. In the Static Web App → **Custom domains**, the domain status will show **Validating**
+2. Once Azure detects the TXT record and validates ownership, the status changes to **Validated**
+3. A managed certificate is automatically provided for HTTPS
+
+If validation is stuck:
+- Ensure the TXT value in your DNS zone **exactly matches** what Azure shows (no extra spaces, correct spelling)
+- Query Azure's authoritative nameserver directly: `nslookup -type=TXT yourdomain.com ns1-01.azure-dns.com`
+- Wait longer — Azure says up to 12 hours
+
+### Step 7: Update API CORS
+
+1. Go to your API App Service → **CORS**
+2. Add your custom domain to **Allowed Origins** (e.g. `https://miacasa.studio`)
+3. Click **Save**
+
+### Step 8: Optional — Custom Domain for API (e.g. api.yourdomain.com)
+
+If you want `api.yourdomain.com` for the API:
+
+1. In the API App Service → **Custom domains** → **+ Add custom domain**
+2. Enter `api.yourdomain.com`
+3. Add the DNS record Azure specifies (usually CNAME)
+4. Add `api.yourdomain.com` to CORS
+5. Update `NEXT_PUBLIC_API_BASE_URL` in the frontend workflow to `https://api.yourdomain.com` and redeploy
 
 ---
 

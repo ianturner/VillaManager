@@ -21,7 +21,10 @@ frontend app structure as implemented in this repo.
 - Both: `cd frontend && npm run dev:all`
 
 ### API Base URL
-Default: `http://localhost:5106` (see `frontend/src/lib/api.ts`).
+When running locally (`npm run dev`), the frontend uses `http://localhost:5106`
+by default. If `NEXT_PUBLIC_API_BASE_URL` is set to a production URL in `.env`,
+it is ignored in development so the local API is always used. For production
+builds, set `NEXT_PUBLIC_API_BASE_URL` to your deployed API URL.
 
 ## API Endpoints
 All endpoints are under `/api`.
