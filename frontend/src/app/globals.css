@@ -43,18 +43,16 @@ main {
   width: min(1400px, 100vw);
   min-width: 320px;
   margin: 0 auto;
-  padding: 32px 20px 72px;
+  padding: 1.5rem 1rem 3rem;
 }
 
 .copyright {
   color: var(--accent);
   margin-top: 2rem;
-  font-size: var(--fontsize--1);
+  font-size: var(--fontsize--2);
   text-align: center;
   filter: opacity(0.75);
 }
-
-
 
 h1, h2, h3, h4, h5, h6 {
   color: var(--accent);
