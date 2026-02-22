@@ -112,6 +112,14 @@ h1, h2, h3 {
   letter-spacing: 0.08rem; /* TODO: make this a theme variable */
 }
 
+hr.divider {
+  color: var(--admin-border);
+  border-width: 1px;
+  border-style: solid;
+  width: 100%;
+  margin: 3px 0;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -139,9 +147,17 @@ a {
 main {
   max-width: 1400px;
   width: min(1400px, 92vw);
-  min-width: 540px;
+  min-width: 320px;
   margin: 0 auto;
   padding: 32px 20px 72px;
+}
+
+.copyright {
+  color: var(--accent);
+  margin-top: 2rem;
+  font-size: var(--fontsize--1);
+  text-align: center;
+  filter: opacity(0.75);
 }
 
 .card {
@@ -1015,7 +1031,12 @@ p.help, p.muted {
 .admin-readonly .admin-field select,
 .admin-readonly .admin-select-trigger {
   pointer-events: none;
-  opacity: 0.8;
+  opacity: 0.6;
+}
+
+input:read-only {
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 /* login form */
@@ -2385,6 +2406,9 @@ input[type=checkbox],
   flex-wrap: wrap;
   align-items: center;
 }
+.admin-form-inline.flex-top {
+  align-items: flex-start;
+}
 
 .admin-field {
   display: flex;
@@ -2403,6 +2427,10 @@ input[type=checkbox],
 
 .admin-form-inline .admin-field {
   flex: 0 1 auto;
+}
+.admin-form-inline .admin-field.admin-field-flex {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .admin-field input,

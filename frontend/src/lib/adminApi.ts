@@ -418,6 +418,106 @@ export async function lookupFlightArrival(
   return response.json();
 }
 
+export type SendGuestLinkEmailParams = {
+  propertyId: string;
+  to: string;
+  guestLink: string;
+  guestName?: string | null;
+  subject?: string | null;
+  htmlBody?: string | null;
+};
+
+export type SendGuestLinkSmsParams = {
+  propertyId: string;
+  to: string;
+  guestLink: string;
+  message?: string | null;
+};
+
+export async function sendGuestLinkEmail(
+  token: string,
+  params: SendGuestLinkEmailParams
+): Promise<{ success: boolean; id?: string | null }> {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}/api/admin/send-guest-link/email`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      propertyId: params.propertyId,
+      to: params.to,
+      guestLink: params.guestLink,
+      guestName: params.guestName ?? undefined,
+      subject: params.subject ?? undefined,
+      htmlBody: params.htmlBody ?? undefined
+    })
+  });
+
+  if (response.status === 401) throw new AuthError();
+  if (response.status === 403) throw new PermissionError();
+  if (response.status === 501) {
+    throw new Error("Guest link email service is not configured.");
+  }
+  if (!response.ok) {
+    const raw = await response.text();
+    let message = "Failed to send email.";
+    if (raw) {
+      try {
+        const err = JSON.parse(raw);
+        message = err?.message ?? message;
+        if (err?.details) message = `${message} ${err.details}`;
+      } catch {
+        message = raw;
+      }
+    }
+    throw new Error(message);
+  }
+  return response.json();
+}
+
+export async function sendGuestLinkSms(
+  token: string,
+  params: SendGuestLinkSmsParams
+): Promise<{ success: boolean }> {
+  const baseUrl = getApiBaseUrl();
+  const response = await fetch(`${baseUrl}/api/admin/send-guest-link/sms`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify({
+      propertyId: params.propertyId,
+      to: params.to,
+      guestLink: params.guestLink,
+      message: params.message ?? undefined
+    })
+  });
+
+  if (response.status === 401) throw new AuthError();
+  if (response.status === 403) throw new PermissionError();
+  if (response.status === 501) {
+    throw new Error("Guest link SMS service is not configured.");
+  }
+  if (!response.ok) {
+    const raw = await response.text();
+    let message = "Failed to send SMS.";
+    if (raw) {
+      try {
+        const err = JSON.parse(raw);
+        message = err?.message ?? message;
+        if (err?.details) message = `${message} ${err.details}`;
+      } catch {
+        message = raw;
+      }
+    }
+    throw new Error(message);
+  }
+  return response.json();
+}
+
 export async function publishProperty(token: string, id: string) {
   const baseUrl = getApiBaseUrl();
   const response = await fetch(`${baseUrl}/api/admin/properties/${id}/publish`, {

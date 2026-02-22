@@ -51,6 +51,8 @@ export type RentalBookingDto = {
   to?: string | null;
   nights?: string | null;
   names?: string | null;
+  guestEmail?: string | null;
+  guestPhone?: string | null;
   source?: string | null;
   dateOfBooking?: string | null;
   bookingId?: string | null;
@@ -77,6 +79,9 @@ export type RentalBookingDto = {
   dateRegisteredWithAade?: string | null;
   aadeScreenshot?: string | null;
   comments?: string | null;
+  hasRegistered?: string | null;
+  registrationImage?: string | null;
+  registrationNotes?: string | null;
 };
 
 export type RentalDto = {

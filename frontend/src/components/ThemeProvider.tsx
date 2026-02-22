@@ -118,6 +118,9 @@ export function ThemeProvider({ theme, className, children }: ThemeProviderProps
       <div className={className ? `theme-root ${className}` : "theme-root"}>
         {children}
       </div>
+      <div className="copyright">
+        © 2026, Mia Casa Studios. Progressive Enhancement FTW.
+      </div>
     </ThemeContext.Provider>
   );
 }

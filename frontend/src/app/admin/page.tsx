@@ -21,6 +21,7 @@ import { getRentalUnits } from "@/lib/types";
 import type { IcalAvailabilityRange } from "@/lib/adminApi";
 import { resolveImageUrl } from "@/lib/api";
 import { resolveTheme } from "@/lib/theme";
+import AdminImageTile from "@/components/AdminImageTile";
 import AdminSelect from "@/components/AdminSelect";
 import FacilityIconPicker from "@/components/FacilityIconPicker";
 import LanguageSelect from "@/components/LanguageSelect";
@@ -54,6 +55,8 @@ import {
   refreshSession,
   lookupFlightArrival,
   revertProperty,
+  sendGuestLinkEmail,
+  sendGuestLinkSms,
   restoreProperty,
   storeSession,
   updateProperty,
@@ -820,6 +823,7 @@ function AdminPageBody({
   const [flightLookupByKey, setFlightLookupByKey] = useState<
     Record<string, { loading: boolean; error?: string }>
   >({});
+  const [sendGuestLinkByKey, setSendGuestLinkByKey] = useState<Record<string, "email" | "sms">>({});
   const [facilityFocus, setFacilityFocus] = useState<{
     groupIndex: number;
     itemIndex: number;
@@ -1454,61 +1458,40 @@ function AdminPageBody({
             ) : (
               <div className="admin-image-grid">
                 {heroImages.map((image, index) => (
-                  <div key={index} className="admin-image-tile">
-                    <div className="admin-image-thumb">
-                      {image.src ? (
-                        <img
-                          src={resolveImageUrl(property.id, image.src)}
-                          alt={resolveLocalizedText(image.alt ?? getImageFilename(image.src), language)}
-                        />
-                      ) : (
-                        <span className="admin-image-placeholder">{t("admin.images.none")}</span>
-                      )}
-                    </div>
-                    <input
-                      className="admin-image-input"
-                      value={image.src}
-                      placeholder={t("admin.images.path")}
-                      onChange={(event) =>
-                        updateDraft(property.id, (current) => ({
-                          ...current,
-                          heroImages: (current.heroImages ?? []).map((item, itemIndex) =>
-                            itemIndex === index ? { ...item, src: event.target.value } : item
-                          )
-                        }))
-                      }
-                    />
-                    <LocalizedTextField
-                      languageOptions={listingOptions}
-                      className="admin-image-caption"
-                      label={t("admin.images.caption")}
-                      value={image.alt}
-                      placeholder={t("admin.images.caption")}
-                      onChange={(nextValue) =>
-                        updateDraft(property.id, (current) => ({
-                          ...current,
-                          heroImages: (current.heroImages ?? []).map((item, itemIndex) =>
-                            itemIndex === index ? { ...item, alt: nextValue } : item
-                          )
-                        }))
-                      }
-                    />
-                    <button
-                      type="button"
-                      className="admin-image-remove"
-                      aria-label={t("admin.actions.removeImage")}
-                      onClick={() =>
-                        updateDraft(property.id, (current) => ({
-                          ...current,
-                          heroImages: (current.heroImages ?? []).filter(
-                            (_item, itemIndex) => itemIndex !== index
-                          )
-                        }))
-                      }
-                    >
-                      <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                  </div>
+                  <AdminImageTile
+                    key={index}
+                    propertyId={property.id}
+                    src={image.src}
+                    pathPlaceholder={t("admin.images.path")}
+                    onSrcChange={(src) =>
+                      updateDraft(property.id, (current) => ({
+                        ...current,
+                        heroImages: (current.heroImages ?? []).map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, src } : item
+                        )
+                      }))
+                    }
+                    showCaption
+                    alt={image.alt}
+                    onAltChange={(alt) =>
+                      updateDraft(property.id, (current) => ({
+                        ...current,
+                        heroImages: (current.heroImages ?? []).map((item, itemIndex) =>
+                          itemIndex === index ? { ...item, alt } : item
+                        )
+                      }))
+                    }
+                    languageOptions={listingOptions}
+                    onRemove={() =>
+                      updateDraft(property.id, (current) => ({
+                        ...current,
+                        heroImages: (current.heroImages ?? []).filter(
+                          (_item, itemIndex) => itemIndex !== index
+                        )
+                      }))
+                    }
+                    removeAriaLabel={t("admin.actions.removeImage")}
+                  />
                 ))}
               </div>
             )}
@@ -1671,86 +1654,61 @@ function AdminPageBody({
                 ) : (
                   <div className="admin-image-grid">
                     {(activePage.heroImages ?? []).map((image, imageIndex) => (
-                      <div key={imageIndex} className="admin-image-tile">
-                        <div className="admin-image-thumb">
-                          {image.src ? (
-                            <img
-                              src={resolveImageUrl(property.id, image.src)}
-                              alt={resolveLocalizedText(image.alt ?? getImageFilename(image.src), language)}
-                            />
-                          ) : (
-                            <span className="admin-image-placeholder">{t("admin.images.none")}</span>
-                          )}
-                        </div>
-                        <input
-                          className="admin-image-input"
-                          value={image.src}
-                          placeholder={t("admin.images.path")}
-                          onChange={(event) =>
-                            updateDraft(property.id, (current) => ({
-                              ...current,
-                              pages: (current.pages ?? []).map((item, itemIndex) =>
-                                itemIndex === activePageIndex
-                                  ? {
-                                      ...item,
-                                      heroImages: (item.heroImages ?? []).map((img, imgIndex) =>
-                                        imgIndex === imageIndex
-                                          ? { ...img, src: event.target.value }
-                                          : img
-                                      )
-                                    }
-                                  : item
-                              )
-                            }))
-                          }
-                        />
-                        <LocalizedTextField
-                          languageOptions={listingOptions}
-                          className="admin-image-caption"
-                          label={t("admin.images.caption")}
-                          value={image.alt}
-                          placeholder={t("admin.images.caption")}
-                          onChange={(nextValue) =>
-                            updateDraft(property.id, (current) => ({
-                              ...current,
-                              pages: (current.pages ?? []).map((item, itemIndex) =>
-                                itemIndex === activePageIndex
-                                  ? {
-                                      ...item,
-                                      heroImages: (item.heroImages ?? []).map((img, imgIndex) =>
-                                        imgIndex === imageIndex
-                                          ? { ...img, alt: nextValue }
-                                          : img
-                                      )
-                                    }
-                                  : item
-                              )
-                            }))
-                          }
-                        />
-                        <button
-                          type="button"
-                          className="admin-image-remove"
-                          aria-label={t("admin.actions.removeImage")}
-                          onClick={() =>
-                            updateDraft(property.id, (current) => ({
-                              ...current,
-                              pages: (current.pages ?? []).map((item, itemIndex) =>
-                                itemIndex === activePageIndex
-                                  ? {
-                                      ...item,
-                                      heroImages: (item.heroImages ?? []).filter(
-                                        (_img, imgIndex) => imgIndex !== imageIndex
-                                      )
-                                    }
-                                  : item
-                              )
-                            }))
-                          }
-                        >
-                          <FontAwesomeIcon icon={faTrash} />
-                        </button>
-                      </div>
+                      <AdminImageTile
+                        key={imageIndex}
+                        propertyId={property.id}
+                        src={image.src}
+                        pathPlaceholder={t("admin.images.path")}
+                        onSrcChange={(src) =>
+                          updateDraft(property.id, (current) => ({
+                            ...current,
+                            pages: (current.pages ?? []).map((item, itemIndex) =>
+                              itemIndex === activePageIndex
+                                ? {
+                                    ...item,
+                                    heroImages: (item.heroImages ?? []).map((img, imgIndex) =>
+                                      imgIndex === imageIndex ? { ...img, src } : img
+                                    )
+                                  }
+                                : item
+                            )
+                          }))
+                        }
+                        showCaption
+                        alt={image.alt}
+                        onAltChange={(nextValue) =>
+                          updateDraft(property.id, (current) => ({
+                            ...current,
+                            pages: (current.pages ?? []).map((item, itemIndex) =>
+                              itemIndex === activePageIndex
+                                ? {
+                                    ...item,
+                                    heroImages: (item.heroImages ?? []).map((img, imgIndex) =>
+                                      imgIndex === imageIndex ? { ...img, alt: nextValue } : img
+                                    )
+                                  }
+                                : item
+                            )
+                          }))
+                        }
+                        languageOptions={listingOptions}
+                        onRemove={() =>
+                          updateDraft(property.id, (current) => ({
+                            ...current,
+                            pages: (current.pages ?? []).map((item, itemIndex) =>
+                              itemIndex === activePageIndex
+                                ? {
+                                    ...item,
+                                    heroImages: (item.heroImages ?? []).filter(
+                                      (_img, imgIndex) => imgIndex !== imageIndex
+                                    )
+                                  }
+                                : item
+                            )
+                          }))
+                        }
+                        removeAriaLabel={t("admin.actions.removeImage")}
+                      />
                     ))}
                   </div>
                 )}
@@ -1970,117 +1928,93 @@ function AdminPageBody({
                             ) : (
                               <div className="admin-image-grid">
                                 {(activeSection.heroImages ?? []).map((image, imageIndex) => (
-                                  <div
+                                  <AdminImageTile
                                     key={imageIndex}
-                                    className="admin-image-tile"
-                                  >
-                                    <div className="admin-image-thumb">
-                                      {image.src ? (
-                                        <img
-                                          src={resolveImageUrl(property.id, image.src)}
-                                          alt={resolveLocalizedText(image.alt ?? getImageFilename(image.src), language)}
-                                        />
-                                      ) : (
-                                        <span className="admin-image-placeholder">{t("admin.images.none")}</span>
-                                      )}
-                                    </div>
-                                    <input
-                                      className="admin-image-input"
-                                      value={image.src}
-                                      placeholder={t("admin.images.path")}
-                                      onChange={(event) =>
-                                        updateDraft(property.id, (current) => ({
-                                          ...current,
-                                          pages: (current.pages ?? []).map((item, itemIndex) =>
-                                            itemIndex === activePageIndex
-                                              ? {
-                                                  ...item,
-                                                  sections: item.sections.map((itemSection, idx) =>
-                                                    idx === activeSectionIndex
-                                                      ? {
-                                                          ...itemSection,
-                                                          heroImages: (
-                                                            itemSection.heroImages ?? []
-                                                          ).map((img, imgIndex) =>
-                                                            imgIndex === imageIndex
-                                                              ? { ...img, src: event.target.value }
-                                                              : img
-                                                          )
-                                                        }
-                                                      : itemSection
-                                                  )
-                                                }
-                                              : item
-                                          )
-                                        }))
-                                      }
-                                    />
-                                    <LocalizedTextField
-                                      languageOptions={listingOptions}
-                                      className="admin-image-caption"
-                                      label={t("admin.images.caption")}
-                                      value={image.alt}
-                                      placeholder={t("admin.images.caption")}
-                                      onChange={(nextValue) =>
-                                        updateDraft(property.id, (current) => ({
-                                          ...current,
-                                          pages: (current.pages ?? []).map((item, itemIndex) =>
-                                            itemIndex === activePageIndex
-                                              ? {
-                                                  ...item,
-                                                  sections: item.sections.map((itemSection, idx) =>
-                                                    idx === activeSectionIndex
-                                                      ? {
-                                                          ...itemSection,
-                                                          heroImages: (
-                                                            itemSection.heroImages ?? []
-                                                          ).map((img, imgIndex) =>
-                                                            imgIndex === imageIndex
-                                                              ? { ...img, alt: nextValue }
-                                                              : img
-                                                          )
-                                                        }
-                                                      : itemSection
-                                                  )
-                                                }
-                                              : item
-                                          )
-                                        }))
-                                      }
-                                    />
-                                    <button
-                                      type="button"
-                                      className="admin-image-remove"
-                                      aria-label={t("admin.actions.removeImage")}
-                                      onClick={() =>
-                                        updateDraft(property.id, (current) => ({
-                                          ...current,
-                                          pages: (current.pages ?? []).map((item, itemIndex) =>
-                                            itemIndex === activePageIndex
-                                              ? {
-                                                  ...item,
-                                                  sections: item.sections.map((itemSection, idx) =>
-                                                    idx === activeSectionIndex
-                                                      ? {
-                                                          ...itemSection,
-                                                          heroImages: (
-                                                            itemSection.heroImages ?? []
-                                                          ).filter(
-                                                            (_img, imgIndex) =>
-                                                              imgIndex !== imageIndex
-                                                          )
-                                                        }
-                                                      : itemSection
-                                                  )
-                                                }
-                                              : item
-                                          )
-                                        }))
-                                      }
-                                    >
-                                      <FontAwesomeIcon icon={faTrash} />
-                                    </button>
-                                  </div>
+                                    propertyId={property.id}
+                                    src={image.src}
+                                    pathPlaceholder={t("admin.images.path")}
+                                    onSrcChange={(src) =>
+                                      updateDraft(property.id, (current) => ({
+                                        ...current,
+                                        pages: (current.pages ?? []).map((item, itemIndex) =>
+                                          itemIndex === activePageIndex
+                                            ? {
+                                                ...item,
+                                                sections: item.sections.map((itemSection, idx) =>
+                                                  idx === activeSectionIndex
+                                                    ? {
+                                                        ...itemSection,
+                                                        heroImages: (
+                                                          itemSection.heroImages ?? []
+                                                        ).map((img, imgIndex) =>
+                                                          imgIndex === imageIndex
+                                                            ? { ...img, src }
+                                                            : img
+                                                        )
+                                                      }
+                                                    : itemSection
+                                                )
+                                              }
+                                            : item
+                                        )
+                                      }))
+                                    }
+                                    showCaption
+                                    alt={image.alt}
+                                    onAltChange={(nextValue) =>
+                                      updateDraft(property.id, (current) => ({
+                                        ...current,
+                                        pages: (current.pages ?? []).map((item, itemIndex) =>
+                                          itemIndex === activePageIndex
+                                            ? {
+                                                ...item,
+                                                sections: item.sections.map((itemSection, idx) =>
+                                                  idx === activeSectionIndex
+                                                    ? {
+                                                        ...itemSection,
+                                                        heroImages: (
+                                                          itemSection.heroImages ?? []
+                                                        ).map((img, imgIndex) =>
+                                                          imgIndex === imageIndex
+                                                            ? { ...img, alt: nextValue }
+                                                            : img
+                                                        )
+                                                      }
+                                                    : itemSection
+                                                )
+                                              }
+                                            : item
+                                        )
+                                      }))
+                                    }
+                                    languageOptions={listingOptions}
+                                    onRemove={() =>
+                                      updateDraft(property.id, (current) => ({
+                                        ...current,
+                                        pages: (current.pages ?? []).map((item, itemIndex) =>
+                                          itemIndex === activePageIndex
+                                            ? {
+                                                ...item,
+                                                sections: item.sections.map((itemSection, idx) =>
+                                                  idx === activeSectionIndex
+                                                    ? {
+                                                        ...itemSection,
+                                                        heroImages: (
+                                                          itemSection.heroImages ?? []
+                                                        ).filter(
+                                                          (_img, imgIndex) =>
+                                                            imgIndex !== imageIndex
+                                                        )
+                                                      }
+                                                    : itemSection
+                                                )
+                                              }
+                                            : item
+                                        )
+                                      }))
+                                    }
+                                    removeAriaLabel={t("admin.actions.removeImage")}
+                                  />
                                 ))}
                               </div>
                             )}
@@ -2178,119 +2112,89 @@ function AdminPageBody({
                             ) : (
                               <div className="admin-image-grid">
                                 {activeSection.images.map((image, imageIndex) => (
-                                  <div
+                                  <AdminImageTile
                                     key={imageIndex}
-                                    className="admin-image-tile"
-                                  >
-                                    <button
-                                      type="button"
-                                      className="admin-image-remove"
-                                      aria-label={t("admin.actions.removeImage")}
-                                      onClick={() =>
-                                        updateDraft(property.id, (current) => ({
-                                          ...current,
-                                          pages: (current.pages ?? []).map((item, itemIndex) =>
-                                            itemIndex === activePageIndex
-                                              ? {
-                                                  ...item,
-                                                  sections: item.sections.map((itemSection, idx) =>
-                                                    idx === activeSectionIndex
-                                                      ? {
-                                                          ...itemSection,
-                                                          images: itemSection.images.filter(
-                                                            (_img, imgIndex) =>
-                                                              imgIndex !== imageIndex
-                                                          )
-                                                        }
-                                                      : itemSection
-                                                  )
-                                                }
-                                              : item
-                                          )
-                                        }))
-                                      }
-                                    >
-                                      <FontAwesomeIcon icon={faTrash} />
-                                    </button>
-                                    <div className="admin-image-thumb">
-                                      {image.src ? (
-                                        <img
-                                          src={resolveImageUrl(property.id, image.src)}
-                                          alt={resolveLocalizedText(image.alt ?? getImageFilename(image.src), language)}
-                                        />
-                                      ) : (
-                                        <span className="admin-image-placeholder">{t("admin.images.none")}</span>
-                                      )}
-                                    </div>
-                                    <input
-                                      className="admin-image-input"
-                                      value={image.src}
-                                      placeholder={t("admin.images.path")}
-                                      onChange={(event) =>
-                                        updateDraft(property.id, (current) => ({
-                                          ...current,
-                                          pages: (current.pages ?? []).map((item, itemIndex) =>
-                                            itemIndex === activePageIndex
-                                              ? {
-                                                  ...item,
-                                                  sections: item.sections.map((itemSection, idx) =>
-                                                    idx === activeSectionIndex
-                                                      ? {
-                                                          ...itemSection,
-                                                          images: itemSection.images.map(
-                                                            (img, imgIndex) =>
-                                                              imgIndex === imageIndex
-                                                                ? {
-                                                                    ...img,
-                                                                    src: event.target.value
-                                                                  }
-                                                                : img
-                                                          )
-                                                        }
-                                                      : itemSection
-                                                  )
-                                                }
-                                              : item
-                                          )
-                                        }))
-                                      }
-                                    />
-                                    <LocalizedTextField
-                                      languageOptions={listingOptions}
-                                      className="admin-image-caption"
-                                      label={t("admin.images.caption")}
-                                      value={image.alt}
-                                      placeholder={t("admin.images.caption")}
-                                      onChange={(nextValue) =>
-                                        updateDraft(property.id, (current) => ({
-                                          ...current,
-                                          pages: (current.pages ?? []).map((item, itemIndex) =>
-                                            itemIndex === activePageIndex
-                                              ? {
-                                                  ...item,
-                                                  sections: item.sections.map((itemSection, idx) =>
-                                                    idx === activeSectionIndex
-                                                      ? {
-                                                          ...itemSection,
-                                                          images: itemSection.images.map(
-                                                            (img, imgIndex) =>
-                                                              imgIndex === imageIndex
-                                                                ? {
-                                                                    ...img,
-                                                                    alt: nextValue
-                                                                  }
-                                                                : img
-                                                          )
-                                                        }
-                                                      : itemSection
-                                                  )
-                                                }
-                                              : item
-                                          )
-                                        }))
-                                      }
-                                    />
-                                  </div>
+                                    propertyId={property.id}
+                                    src={image.src}
+                                    pathPlaceholder={t("admin.images.path")}
+                                    onSrcChange={(src) =>
+                                      updateDraft(property.id, (current) => ({
+                                        ...current,
+                                        pages: (current.pages ?? []).map((item, itemIndex) =>
+                                          itemIndex === activePageIndex
+                                            ? {
+                                                ...item,
+                                                sections: item.sections.map((itemSection, idx) =>
+                                                  idx === activeSectionIndex
+                                                    ? {
+                                                        ...itemSection,
+                                                        images: itemSection.images.map(
+                                                          (img, imgIndex) =>
+                                                            imgIndex === imageIndex
+                                                              ? { ...img, src }
+                                                              : img
+                                                        )
+                                                      }
+                                                    : itemSection
+                                                )
+                                              }
+                                            : item
+                                        )
+                                      }))
+                                    }
+                                    showCaption
+                                    alt={image.alt}
+                                    onAltChange={(nextValue) =>
+                                      updateDraft(property.id, (current) => ({
+                                        ...current,
+                                        pages: (current.pages ?? []).map((item, itemIndex) =>
+                                          itemIndex === activePageIndex
+                                            ? {
+                                                ...item,
+                                                sections: item.sections.map((itemSection, idx) =>
+                                                  idx === activeSectionIndex
+                                                    ? {
+                                                        ...itemSection,
+                                                        images: itemSection.images.map(
+                                                          (img, imgIndex) =>
+                                                            imgIndex === imageIndex
+                                                              ? { ...img, alt: nextValue }
+                                                              : img
+                                                        )
+                                                      }
+                                                    : itemSection
+                                                )
+                                              }
+                                            : item
+                                        )
+                                      }))
+                                    }
+                                    languageOptions={listingOptions}
+                                    onRemove={() =>
+                                      updateDraft(property.id, (current) => ({
+                                        ...current,
+                                        pages: (current.pages ?? []).map((item, itemIndex) =>
+                                          itemIndex === activePageIndex
+                                            ? {
+                                                ...item,
+                                                sections: item.sections.map((itemSection, idx) =>
+                                                  idx === activeSectionIndex
+                                                    ? {
+                                                        ...itemSection,
+                                                        images: itemSection.images.filter(
+                                                          (_img, imgIndex) =>
+                                                            imgIndex !== imageIndex
+                                                        )
+                                                      }
+                                                    : itemSection
+                                                )
+                                              }
+                                            : item
+                                        )
+                                      }))
+                                    }
+                                    removeAriaLabel={t("admin.actions.removeImage")}
+                                  />
                                 ))}
                               </div>
                             )}
@@ -2575,73 +2479,52 @@ function AdminPageBody({
                           ) : (
                             <div className="admin-image-grid">
                               {(item.heroImages ?? []).map((image, imageIndex) => (
-                                <div key={imageIndex} className="admin-image-tile">
-                                  <div className="admin-image-thumb">
-                                    {image.src ? (
-                                      <img
-                                        src={resolveImageUrl(property.id, image.src)}
-                                        alt={resolveLocalizedText(image.alt ?? getImageFilename(image.src), language)}
-                                      />
-                                    ) : (
-                                      <span className="admin-image-placeholder">{t("admin.images.none")}</span>
-                                    )}
-                                  </div>
-                                  <input
-                                    className="admin-image-input"
-                                    value={image.src}
-                                    placeholder={t("admin.images.path")}
-                                    onChange={(event) =>
-                                      onChange((items ?? []).map((entry, index) =>
-                                        index === itemIndex
-                                          ? {
-                                              ...entry,
-                                              heroImages: (entry.heroImages ?? []).map((img, idx) =>
-                                                idx === imageIndex ? { ...img, src: event.target.value } : img
-                                              )
-                                            }
-                                          : entry
-                                      ))
-                                    }
-                                  />
-                                  <LocalizedTextField
-                                    languageOptions={listingOptions}
-                                    className="admin-image-caption"
-                                    label={t("admin.images.caption")}
-                                    value={image.alt}
-                                    placeholder={t("admin.images.caption")}
-                                    onChange={(nextValue) =>
-                                      onChange((items ?? []).map((entry, index) =>
-                                        index === itemIndex
-                                          ? {
-                                              ...entry,
-                                              heroImages: (entry.heroImages ?? []).map((img, idx) =>
-                                                idx === imageIndex ? { ...img, alt: nextValue } : img
-                                              )
-                                            }
-                                          : entry
-                                      ))
-                                    }
-                                  />
-                                  <button
-                                    type="button"
-                                    className="admin-image-remove"
-                                    aria-label={t("admin.actions.removeImage")}
-                                    onClick={() =>
-                                      onChange((items ?? []).map((entry, index) =>
-                                        index === itemIndex
-                                          ? {
-                                              ...entry,
-                                              heroImages: (entry.heroImages ?? []).filter(
-                                                (_img, idx) => idx !== imageIndex
-                                              )
-                                            }
-                                          : entry
-                                      ))
-                                    }
-                                  >
-                                    <FontAwesomeIcon icon={faTrash} />
-                                  </button>
-                                </div>
+                                <AdminImageTile
+                                  key={imageIndex}
+                                  propertyId={property.id}
+                                  src={image.src}
+                                  pathPlaceholder={t("admin.images.path")}
+                                  onSrcChange={(src) =>
+                                    onChange((items ?? []).map((entry, index) =>
+                                      index === itemIndex
+                                        ? {
+                                            ...entry,
+                                            heroImages: (entry.heroImages ?? []).map((img, idx) =>
+                                              idx === imageIndex ? { ...img, src } : img
+                                            )
+                                          }
+                                        : entry
+                                    ))
+                                  }
+                                  showCaption
+                                  alt={image.alt}
+                                  onAltChange={(nextValue) =>
+                                    onChange((items ?? []).map((entry, index) =>
+                                      index === itemIndex
+                                        ? {
+                                            ...entry,
+                                            heroImages: (entry.heroImages ?? []).map((img, idx) =>
+                                              idx === imageIndex ? { ...img, alt: nextValue } : img
+                                            )
+                                          }
+                                        : entry
+                                    ))
+                                  }
+                                  languageOptions={listingOptions}
+                                  onRemove={() =>
+                                    onChange((items ?? []).map((entry, index) =>
+                                      index === itemIndex
+                                        ? {
+                                            ...entry,
+                                            heroImages: (entry.heroImages ?? []).filter(
+                                              (_img, idx) => idx !== imageIndex
+                                            )
+                                          }
+                                        : entry
+                                    ))
+                                  }
+                                  removeAriaLabel={t("admin.actions.removeImage")}
+                                />
                               ))}
                             </div>
                           )}
@@ -2687,73 +2570,52 @@ function AdminPageBody({
                         ) : (
                           <div className="admin-image-grid">
                             {(item.galleryImages ?? []).map((image, imageIndex) => (
-                              <div key={imageIndex} className="admin-image-tile">
-                                <div className="admin-image-thumb">
-                                  {image.src ? (
-                                    <img
-                                      src={resolveImageUrl(property.id, image.src)}
-                                      alt={resolveLocalizedText(image.alt ?? getImageFilename(image.src), language)}
-                                    />
-                                  ) : (
-                                    <span className="admin-image-placeholder">{t("admin.images.none")}</span>
-                                  )}
-                                </div>
-                                <input
-                                  className="admin-image-input"
-                                  value={image.src}
-                                  placeholder={t("admin.images.path")}
-                                  onChange={(event) =>
-                                    onChange((items ?? []).map((entry, index) =>
-                                      index === itemIndex
-                                        ? {
-                                            ...entry,
-                                            galleryImages: (entry.galleryImages ?? []).map((img, idx) =>
-                                              idx === imageIndex ? { ...img, src: event.target.value } : img
-                                            )
-                                          }
-                                        : entry
-                                    ))
-                                  }
-                                />
-                                <LocalizedTextField
-                                  languageOptions={listingOptions}
-                                  className="admin-image-caption"
-                                  label={t("admin.images.caption")}
-                                  value={image.alt}
-                                  placeholder={t("admin.images.caption")}
-                                  onChange={(nextValue) =>
-                                    onChange((items ?? []).map((entry, index) =>
-                                      index === itemIndex
-                                        ? {
-                                            ...entry,
-                                            galleryImages: (entry.galleryImages ?? []).map((img, idx) =>
-                                              idx === imageIndex ? { ...img, alt: nextValue } : img
-                                            )
-                                          }
-                                        : entry
-                                    ))
-                                  }
-                                />
-                                <button
-                                  type="button"
-                                  className="admin-image-remove"
-                                  aria-label={t("admin.actions.removeImage")}
-                                  onClick={() =>
-                                    onChange((items ?? []).map((entry, index) =>
-                                      index === itemIndex
-                                        ? {
-                                            ...entry,
-                                            galleryImages: (entry.galleryImages ?? []).filter(
-                                              (_img, idx) => idx !== imageIndex
-                                            )
-                                          }
-                                        : entry
-                                    ))
-                                  }
-                                >
-                                  <FontAwesomeIcon icon={faTrash} />
-                                </button>
-                              </div>
+                              <AdminImageTile
+                                key={imageIndex}
+                                propertyId={property.id}
+                                src={image.src}
+                                pathPlaceholder={t("admin.images.path")}
+                                onSrcChange={(src) =>
+                                  onChange((items ?? []).map((entry, index) =>
+                                    index === itemIndex
+                                      ? {
+                                          ...entry,
+                                          galleryImages: (entry.galleryImages ?? []).map((img, idx) =>
+                                            idx === imageIndex ? { ...img, src } : img
+                                          )
+                                        }
+                                      : entry
+                                  ))
+                                }
+                                showCaption
+                                alt={image.alt}
+                                onAltChange={(nextValue) =>
+                                  onChange((items ?? []).map((entry, index) =>
+                                    index === itemIndex
+                                      ? {
+                                          ...entry,
+                                          galleryImages: (entry.galleryImages ?? []).map((img, idx) =>
+                                            idx === imageIndex ? { ...img, alt: nextValue } : img
+                                          )
+                                        }
+                                      : entry
+                                  ))
+                                }
+                                languageOptions={listingOptions}
+                                onRemove={() =>
+                                  onChange((items ?? []).map((entry, index) =>
+                                    index === itemIndex
+                                      ? {
+                                          ...entry,
+                                          galleryImages: (entry.galleryImages ?? []).filter(
+                                            (_img, idx) => idx !== imageIndex
+                                          )
+                                        }
+                                      : entry
+                                  ))
+                                }
+                                removeAriaLabel={t("admin.actions.removeImage")}
+                              />
                             ))}
                           </div>
                         )}
@@ -4221,8 +4083,8 @@ function AdminPageBody({
                 const bookingDateValue = booking.dateOfBooking?.trim() ?? "";
                 const guestLink =
                   bookingIdValue && bookingDateValue
-                    ? `${window.location.origin}/?id=${encodeURIComponent(property.id)}`
-                      + `&source=guest&bookingId=${encodeURIComponent(bookingIdValue)}`
+                    ? `${window.location.origin}/${encodeURIComponent(property.id)}`
+                      + `?source=guest&bookingId=${encodeURIComponent(bookingIdValue)}`
                       + `&bookingDate=${encodeURIComponent(bookingDateValue)}`
                     : "";
                 const toDate = parseDateValue(booking.to);
@@ -4495,74 +4357,294 @@ function AdminPageBody({
                               }
                             />
                           </div>
-                          <div className="admin-field">
-                            <span>{t("admin.bookings.source")}</span>
-                            <AdminSelect
-                              value={booking.source ?? ""}
-                              options={bookingSourceOptions}
-                              onChange={(value) =>
-                                updateBooking(property.id, index, { source: value })
-                              }
-                            />
-                          </div>
-                          <label
-                            className={`admin-field admin-checkbox${
-                              (booking.vipGuest ?? "").toLowerCase() === "yes" ? " vip-checked" : ""
-                            }`}
-                          >
-                            <span>{t("admin.bookings.vipGuest")}</span>
+                        </div>
+                        <div className="admin-form admin-form-inline admin-booking-row">
+                          <label className="admin-field admin-field-flex">
+                            <span>{t("admin.bookings.guestLink")}</span>
                             <input
-                              type="checkbox"
-                              checked={(booking.vipGuest ?? "").toLowerCase() === "yes"}
-                              onChange={(event) =>
-                                updateBooking(property.id, index, {
-                                  vipGuest: event.target.checked ? "Yes" : "No"
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="admin-field admin-checkbox admin-booking-row">
-                            <span>{t("admin.bookings.repeatVisit")}</span>
-                            <input
-                              type="checkbox"
-                              checked={(booking.repeatVisit ?? "").toLowerCase() === "yes"}
-                              onChange={(event) =>
-                                updateBooking(property.id, index, {
-                                  repeatVisit: event.target.checked ? "Yes" : "No"
-                                })
-                              }
-                            />
-                          </label>
-                          <label className="admin-field">
-                            <span>{t("admin.bookings.dateOfBooking")}</span>
-                            <input
-                              className="admin-input-date"
-                              value={booking.dateOfBooking ?? ""}
-                              onChange={(event) => {
-                                const nextDate = event.target.value;
-                                const shouldUpdateRate = !toNumber(booking.exchangeRateEurGbp);
-                                const nextRate = shouldUpdateRate
-                                  ? getEurGbpRate(parseDateValue(nextDate))
-                                  : exchangeRateValue;
-                                const nextIncomeGbp =
-                                  incomeEurValue !== null ? incomeEurValue * nextRate : null;
-                                updateBooking(property.id, index, {
-                                  dateOfBooking: nextDate,
-                                  exchangeRateEurGbp: shouldUpdateRate
-                                    ? formatMoney(nextRate)
-                                    : booking.exchangeRateEurGbp ?? "",
-                                  incomeGbp: nextIncomeGbp !== null ? formatMoney(nextIncomeGbp) : "",
-                                  gbpPerNight:
-                                    nextIncomeGbp !== null && computedNights
-                                      ? formatMoney(nextIncomeGbp / computedNights)
-                                      : ""
-                                });
-                              }}
+                              type="text"
+                              readOnly
+                              value={guestLink || ""}
+                              placeholder={guestLink ? undefined : t("admin.bookings.guestLinkMissing")}
                             />
                           </label>
                         </div>
+                        <div className="admin-form admin-form-inline admin-booking-row">
+                          <label className="admin-field">
+                            <span>{t("admin.bookings.guestEmail")}</span>
+                            <div className="admin-inline-input">
+                              <input
+                                type="email"
+                                className="admin-input-name"
+                                value={booking.guestEmail ?? ""}
+                                placeholder={t("admin.bookings.guestEmailPlaceholder")}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    guestEmail: event.target.value || null
+                                  })
+                                }
+                              />
+                              <button
+                                type="button"
+                                className="admin-secondary"
+                                disabled={
+                                  !guestLink ||
+                                  !(booking.guestEmail ?? "").trim() ||
+                                  sendGuestLinkByKey[bookingKey] === "email"
+                                }
+                                title={
+                                  !guestLink
+                                    ? t("admin.bookings.guestLinkMissing")
+                                    : !(booking.guestEmail ?? "").trim()
+                                      ? t("admin.bookings.guestEmailRequired")
+                                      : t("admin.bookings.emailGuestLink")
+                                }
+                                onClick={async () => {
+                                  const email = (booking.guestEmail ?? "").trim();
+                                  if (!guestLink || !email || !token) return;
+                                  setSendGuestLinkByKey((prev) => ({ ...prev, [bookingKey]: "email" }));
+                                  try {
+                                    await sendGuestLinkEmail(token, {
+                                      propertyId: property.id,
+                                      to: email,
+                                      guestLink,
+                                      guestName: booking.names ?? undefined
+                                    });
+                                    setToastMessage(t("admin.bookings.guestLinkEmailSent"));
+                                  } catch (err) {
+                                    setToastMessage(
+                                      err instanceof Error ? err.message : t("admin.bookings.guestLinkSendFailed")
+                                    );
+                                  } finally {
+                                    setSendGuestLinkByKey((prev) => {
+                                      const next = { ...prev };
+                                      delete next[bookingKey];
+                                      return next;
+                                    });
+                                  }
+                                }}
+                              >
+                                {sendGuestLinkByKey[bookingKey] === "email" ? (
+                                  <FontAwesomeIcon icon={faSpinner} spin />
+                                ) : (
+                                  <FontAwesomeIcon icon={faLink} />
+                                )}
+                                <span>{t("admin.bookings.emailGuestLink")}</span>
+                              </button>
+                            </div>
+                          </label>
+                          <label className="admin-field">
+                            <span>{t("admin.bookings.guestPhone")}</span>
+                            <div className="admin-inline-input">
+                              <input
+                                type="tel"
+                                className="admin-input-name"
+                                value={booking.guestPhone ?? ""}
+                                placeholder={t("admin.bookings.guestPhonePlaceholder")}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    guestPhone: event.target.value || null
+                                  })
+                                }
+                              />
+                              <button
+                                type="button"
+                                className="admin-secondary"
+                                disabled={
+                                  !guestLink ||
+                                  !(booking.guestPhone ?? "").trim() ||
+                                  sendGuestLinkByKey[bookingKey] === "sms"
+                                }
+                                title={
+                                  !guestLink
+                                    ? t("admin.bookings.guestLinkMissing")
+                                    : !(booking.guestPhone ?? "").trim()
+                                      ? t("admin.bookings.guestPhoneRequired")
+                                      : t("admin.bookings.sendGuestLinkSms")
+                                }
+                                onClick={async () => {
+                                  const phone = (booking.guestPhone ?? "").trim();
+                                  if (!guestLink || !phone || !token) return;
+                                  setSendGuestLinkByKey((prev) => ({ ...prev, [bookingKey]: "sms" }));
+                                  try {
+                                    await sendGuestLinkSms(token, {
+                                      propertyId: property.id,
+                                      to: phone,
+                                      guestLink
+                                    });
+                                    setToastMessage(t("admin.bookings.guestLinkSmsSent"));
+                                  } catch (err) {
+                                    setToastMessage(
+                                      err instanceof Error ? err.message : t("admin.bookings.guestLinkSendFailed")
+                                    );
+                                  } finally {
+                                    setSendGuestLinkByKey((prev) => {
+                                      const next = { ...prev };
+                                      delete next[bookingKey];
+                                      return next;
+                                    });
+                                  }
+                                }}
+                              >
+                                {sendGuestLinkByKey[bookingKey] === "sms" ? (
+                                  <FontAwesomeIcon icon={faSpinner} spin />
+                                ) : (
+                                  <FontAwesomeIcon icon={faLink} />
+                                )}
+                                <span>{t("admin.bookings.sendGuestLinkSms")}</span>
+                              </button>
+                            </div>
+                          </label>
+                        </div>
+                        <div className="admin-form admin-form-inline admin-booking-row">
+                            <div className="admin-field">
+                              <span>{t("admin.bookings.source")}</span>
+                              <AdminSelect
+                                value={booking.source ?? ""}
+                                options={bookingSourceOptions}
+                                onChange={(value) =>
+                                  updateBooking(property.id, index, { source: value })
+                                }
+                              />
+                            </div>
+                            <label
+                              className={`admin-field admin-checkbox${
+                                (booking.vipGuest ?? "").toLowerCase() === "yes" ? " vip-checked" : ""
+                              }`}
+                            >
+                              <span>{t("admin.bookings.vipGuest")}</span>
+                              <input
+                                type="checkbox"
+                                checked={(booking.vipGuest ?? "").toLowerCase() === "yes"}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    vipGuest: event.target.checked ? "Yes" : "No"
+                                  })
+                                }
+                              />
+                            </label>
+
+                            <label className="admin-field admin-checkbox admin-booking-row">
+                              <span>{t("admin.bookings.repeatVisit")}</span>
+                              <input
+                                type="checkbox"
+                                checked={(booking.repeatVisit ?? "").toLowerCase() === "yes"}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    repeatVisit: event.target.checked ? "Yes" : "No"
+                                  })
+                                }
+                              />
+                            </label>
+                            <label className="admin-field">
+                              <span>{t("admin.bookings.dateOfBooking")}</span>
+                              <input
+                                className="admin-input-date"
+                                value={booking.dateOfBooking ?? ""}
+                                onChange={(event) => {
+                                  const nextDate = event.target.value;
+                                  const shouldUpdateRate = !toNumber(booking.exchangeRateEurGbp);
+                                  const nextRate = shouldUpdateRate
+                                    ? getEurGbpRate(parseDateValue(nextDate))
+                                    : exchangeRateValue;
+                                  const nextIncomeGbp =
+                                    incomeEurValue !== null ? incomeEurValue * nextRate : null;
+                                  updateBooking(property.id, index, {
+                                    dateOfBooking: nextDate,
+                                    exchangeRateEurGbp: shouldUpdateRate
+                                      ? formatMoney(nextRate)
+                                      : booking.exchangeRateEurGbp ?? "",
+                                    incomeGbp: nextIncomeGbp !== null ? formatMoney(nextIncomeGbp) : "",
+                                    gbpPerNight:
+                                      nextIncomeGbp !== null && computedNights
+                                        ? formatMoney(nextIncomeGbp / computedNights)
+                                        : ""
+                                  });
+                                }}
+                              />
+                            </label>
+                          </div>
                         {isAirbnbSource ? (
+                          <>
+                          <hr className="divider" />
+                          <div className="admin-form admin-form-inline flex-top admin-booking-row">
+                            <label
+                              className={`admin-field admin-checkbox${
+                                (booking.hasRegistered ?? "").toLowerCase() === "yes"
+                                  ? " vip-checked"
+                                  : ""
+                              }`}
+                            >
+                              <span>{t("admin.bookings.hasRegistered")}</span>
+                              <input
+                                type="checkbox"
+                                checked={(booking.hasRegistered ?? "").toLowerCase() === "yes"}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    hasRegistered: event.target.checked ? "Yes" : "No"
+                                  })
+                                }
+                              />
+                            </label>
+                            <label className="admin-field">
+                              <span>{t("admin.bookings.registrationImage")}</span>
+                              <AdminImageTile
+                                propertyId={property.id}
+                                src={booking.registrationImage ?? ""}
+                                pathPlaceholder={t("admin.bookings.registrationImagePlaceholder")}
+                                onSrcChange={(src) =>
+                                  updateBooking(property.id, index, {
+                                    registrationImage: src
+                                  })
+                                }
+                                showCaption={false}
+                                onRemove={() =>
+                                  updateBooking(property.id, index, {
+                                    registrationImage: ""
+                                  })
+                                }
+                                removeAriaLabel={t("admin.actions.removeImage")}
+                              />
+                            </label>
+                            <label className="admin-field admin-field-flex">
+                              <span>{t("admin.bookings.registrationNotes")}</span>
+                              <textarea
+                                value={booking.registrationNotes ?? ""}
+                                rows={6}
+                                placeholder={t("admin.bookings.registrationNotesPlaceholder")}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    registrationNotes: event.target.value
+                                  })
+                                }
+                              />
+                            </label>
+                          </div>
                           <div className="admin-form admin-form-inline admin-booking-row">
+                            <label className="admin-field">
+                              <span>{t("admin.bookings.aadeRegisteredDate")}</span>
+                              <input
+                                className="admin-input-date"
+                                value={aadeDateValue}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    dateRegisteredWithAade: event.target.value
+                                  })
+                                }
+                              />
+                            </label>
+                            <label className="admin-field">
+                              <span>{t("admin.bookings.aadeScreenshot")}</span>
+                              <input
+                                value={booking.aadeScreenshot ?? ""}
+                                onChange={(event) =>
+                                  updateBooking(property.id, index, {
+                                    aadeScreenshot: event.target.value
+                                  })
+                                }
+                              />
+                            </label>
+
                             <label className="admin-field">
                               <span>{t("admin.bookings.identificationType")}</span>
                               <input
@@ -4586,6 +4668,8 @@ function AdminPageBody({
                               />
                             </label>
                           </div>
+                          <hr className="divider" />
+                          </>
                         ) : null}
                         <div className="admin-form admin-form-inline admin-booking-row">
                           <label className="admin-field">
@@ -4747,6 +4831,8 @@ function AdminPageBody({
                           </label>
                         </div>
                         {canViewFinancials ? (
+                          <>
+                          <hr className="divider" />
                           <div className="admin-form admin-form-inline admin-booking-row">
                             <label className="admin-field">
                               <span>{t("admin.bookings.incomeEur")}</span>
@@ -4848,6 +4934,8 @@ function AdminPageBody({
                               />
                             </label>
                           </div>
+                          <hr className="divider" />
+                          </>
                         ) : null}
                         <div className="admin-form admin-form-inline admin-booking-row">
                           <label className="admin-field">
@@ -4858,33 +4946,6 @@ function AdminPageBody({
                               value={cleanDateValue}
                             />
                           </label>
-                          {isAirbnbSource ? (
-                            <>
-                              <label className="admin-field">
-                                <span>{t("admin.bookings.aadeRegisteredDate")}</span>
-                                <input
-                                  className="admin-input-date"
-                                  value={aadeDateValue}
-                                  onChange={(event) =>
-                                    updateBooking(property.id, index, {
-                                      dateRegisteredWithAade: event.target.value
-                                    })
-                                  }
-                                />
-                              </label>
-                              <label className="admin-field">
-                                <span>{t("admin.bookings.aadeScreenshot")}</span>
-                                <input
-                                  value={booking.aadeScreenshot ?? ""}
-                                  onChange={(event) =>
-                                    updateBooking(property.id, index, {
-                                      aadeScreenshot: event.target.value
-                                    })
-                                  }
-                                />
-                              </label>
-                            </>
-                          ) : null}
                         </div>
                         <label className="admin-field">
                           <span>{t("admin.bookings.comments")}</span>
@@ -5276,32 +5337,32 @@ function AdminPageBody({
                         <div className="admin-inline-row">
                           <AdminSelect
                             value={contact.category || "Emergency Services"}
-                        options={emergencyContactCategories}
-                        onChange={(nextValue) =>
-                          updateDraft(property.id, (current) => {
-                            const prev = current.guestInfo ?? {
-                              wifiNetworkName: null,
-                              wifiPassword: null,
-                              wifiNotes: null,
-                              equipmentInstructions: [],
-                              healthAndSafety: { emergencyContacts: [], safetyAdviceItems: [] }
-                            };
-                            const healthPrev = prev.healthAndSafety ?? {
-                              emergencyContacts: [],
-                              safetyAdviceItems: []
-                            };
-                            const nextList = (healthPrev.emergencyContacts ?? []).map((c, i) =>
-                              i === cIndex ? { ...c, category: nextValue } : c
-                            );
-                            return {
-                              ...current,
-                              guestInfo: {
-                                ...prev,
-                                healthAndSafety: { ...healthPrev, emergencyContacts: nextList }
-                              }
-                            };
-                          })
-                        }
+                            options={emergencyContactCategories}
+                            onChange={(nextValue) =>
+                              updateDraft(property.id, (current) => {
+                                const prev = current.guestInfo ?? {
+                                  wifiNetworkName: null,
+                                  wifiPassword: null,
+                                  wifiNotes: null,
+                                  equipmentInstructions: [],
+                                  healthAndSafety: { emergencyContacts: [], safetyAdviceItems: [] }
+                                };
+                                const healthPrev = prev.healthAndSafety ?? {
+                                  emergencyContacts: [],
+                                  safetyAdviceItems: []
+                                };
+                                const nextList = (healthPrev.emergencyContacts ?? []).map((c, i) =>
+                                  i === cIndex ? { ...c, category: nextValue } : c
+                                );
+                                return {
+                                  ...current,
+                                  guestInfo: {
+                                    ...prev,
+                                    healthAndSafety: { ...healthPrev, emergencyContacts: nextList }
+                                  }
+                                };
+                              })
+                            }
                       />
                       <input
                         type="text"
@@ -5540,174 +5601,72 @@ function AdminPageBody({
                           <span>{t("admin.actions.addImage")}</span>
                         </button>
                       </div>
-                      {((contact.images ?? []).length === 0 ? (
+                      {(contact.images ?? []).length === 0 ? (
                         <p className="muted">{t("admin.hero.none")}</p>
                       ) : (
                         <div className="admin-image-grid">
                           {(contact.images ?? []).map((image, imgIndex) => (
-                            <div key={imgIndex} className="admin-image-tile">
-                              <div className="admin-image-thumb">
-                                {image.src ? (
-                                  <img
-                                    src={resolveImageUrl(property.id, image.src)}
-                                    alt={resolveLocalizedText(
-                                      image.alt ?? getImageFilename(image.src),
-                                      language
-                                    )}
-                                  />
-                                ) : (
-                                  <span className="admin-image-placeholder">
-                                    {t("admin.images.none")}
-                                  </span>
-                                )}
-                              </div>
-                              <input
-                                className="admin-image-input"
-                                value={image.src}
-                                placeholder={t("admin.images.path")}
-                                onChange={(event) =>
-                                  updateDraft(property.id, (current) => {
-                                    const prev = current.guestInfo ?? {
-                                      wifiNetworkName: null,
-                                      wifiPassword: null,
-                                      wifiNotes: null,
-                                      equipmentInstructions: [],
-                                      healthAndSafety: {
-                                        emergencyContacts: [],
-                                        safetyAdviceItems: []
-                                      }
-                                    };
-                                    const healthPrev = prev.healthAndSafety ?? {
-                                      emergencyContacts: [],
-                                      safetyAdviceItems: []
-                                    };
-                                    const nextList = (
-                                      healthPrev.emergencyContacts ?? []
-                                    ).map((c, i) =>
-                                      i === cIndex
-                                        ? {
-                                            ...c,
-                                            images: (c.images ?? []).map((img, ii) =>
-                                              ii === imgIndex
-                                                ? { ...img, src: event.target.value }
-                                                : img
-                                            )
-                                          }
-                                        : c
-                                    );
-                                    return {
-                                      ...current,
-                                      guestInfo: {
-                                        ...prev,
-                                        healthAndSafety: {
-                                          ...healthPrev,
-                                          emergencyContacts: nextList
-                                        }
-                                      }
-                                    };
-                                  })
-                                }
-                              />
-                              <LocalizedTextField
-                                languageOptions={listingOptions}
-                                className="admin-image-caption"
-                                label={t("admin.images.caption")}
-                                value={image.alt}
-                                placeholder={t("admin.images.caption")}
-                                onChange={(nextValue) =>
-                                  updateDraft(property.id, (current) => {
-                                    const prev = current.guestInfo ?? {
-                                      wifiNetworkName: null,
-                                      wifiPassword: null,
-                                      wifiNotes: null,
-                                      equipmentInstructions: [],
-                                      healthAndSafety: {
-                                        emergencyContacts: [],
-                                        safetyAdviceItems: []
-                                      }
-                                    };
-                                    const healthPrev = prev.healthAndSafety ?? {
-                                      emergencyContacts: [],
-                                      safetyAdviceItems: []
-                                    };
-                                    const nextList = (
-                                      healthPrev.emergencyContacts ?? []
-                                    ).map((c, i) =>
-                                      i === cIndex
-                                        ? {
-                                            ...c,
-                                            images: (c.images ?? []).map((img, ii) =>
-                                              ii === imgIndex
-                                                ? { ...img, alt: nextValue }
-                                                : img
-                                            )
-                                          }
-                                        : c
-                                    );
-                                    return {
-                                      ...current,
-                                      guestInfo: {
-                                        ...prev,
-                                        healthAndSafety: {
-                                          ...healthPrev,
-                                          emergencyContacts: nextList
-                                        }
-                                      }
-                                    };
-                                  })
-                                }
-                              />
-                              <button
-                                type="button"
-                                className="admin-image-remove"
-                                aria-label={t("admin.actions.removeImage")}
-                                onClick={() =>
-                                  updateDraft(property.id, (current) => {
-                                    const prev = current.guestInfo ?? {
-                                      wifiNetworkName: null,
-                                      wifiPassword: null,
-                                      wifiNotes: null,
-                                      equipmentInstructions: [],
-                                      healthAndSafety: {
-                                        emergencyContacts: [],
-                                        safetyAdviceItems: []
-                                      }
-                                    };
-                                    const healthPrev = prev.healthAndSafety ?? {
-                                      emergencyContacts: [],
-                                      safetyAdviceItems: []
-                                    };
-                                    const nextList = (
-                                      healthPrev.emergencyContacts ?? []
-                                    ).map((c, i) =>
-                                      i === cIndex
-                                        ? {
-                                            ...c,
-                                            images: (c.images ?? []).filter(
-                                              (_img, ii) => ii !== imgIndex
-                                            )
-                                          }
-                                        : c
-                                    );
-                                    return {
-                                      ...current,
-                                      guestInfo: {
-                                        ...prev,
-                                        healthAndSafety: {
-                                          ...healthPrev,
-                                          emergencyContacts: nextList
-                                        }
-                                      }
-                                    };
-                                  })
-                                }
-                              >
-                                <FontAwesomeIcon icon={faTrash} />
-                              </button>
-                            </div>
+                            <AdminImageTile
+                              key={imgIndex}
+                              propertyId={property.id}
+                              src={image.src}
+                              pathPlaceholder={t("admin.images.path")}
+                              onSrcChange={(src) =>
+                                updateDraft(property.id, (current) => {
+                                  const prev = current.guestInfo ?? { wifiNetworkName: null, wifiPassword: null, wifiNotes: null, equipmentInstructions: [], healthAndSafety: { emergencyContacts: [], safetyAdviceItems: [] } };
+                                  const healthPrev = prev.healthAndSafety ?? { emergencyContacts: [], safetyAdviceItems: [] };
+                                  const nextList = (healthPrev.emergencyContacts ?? []).map((c, i) =>
+                                    i === cIndex ? { ...c, images: (c.images ?? []).map((img, ii) => ii === imgIndex ? { ...img, src } : img) } : c
+                                  );
+                                  return {
+                                    ...current,
+                                    guestInfo: {
+                                      ...prev,
+                                      healthAndSafety: { ...healthPrev, emergencyContacts: nextList }
+                                    }
+                                  };
+                                })
+                              }
+                              showCaption
+                              alt={image.alt}
+                              onAltChange={(nextValue) =>
+                                updateDraft(property.id, (current) => {
+                                  const prev = current.guestInfo ?? { wifiNetworkName: null, wifiPassword: null, wifiNotes: null, equipmentInstructions: [], healthAndSafety: { emergencyContacts: [], safetyAdviceItems: [] } };
+                                  const healthPrev = prev.healthAndSafety ?? { emergencyContacts: [], safetyAdviceItems: [] };
+                                  const nextList = (healthPrev.emergencyContacts ?? []).map((c, i) =>
+                                    i === cIndex ? { ...c, images: (c.images ?? []).map((img, ii) => ii === imgIndex ? { ...img, alt: nextValue } : img) } : c
+                                  );
+                                  return {
+                                    ...current,
+                                    guestInfo: {
+                                      ...prev,
+                                      healthAndSafety: { ...healthPrev, emergencyContacts: nextList }
+                                    }
+                                  };
+                                })
+                              }
+                              languageOptions={listingOptions}
+                              onRemove={() =>
+                                updateDraft(property.id, (current) => {
+                                  const prev = current.guestInfo ?? { wifiNetworkName: null, wifiPassword: null, wifiNotes: null, equipmentInstructions: [], healthAndSafety: { emergencyContacts: [], safetyAdviceItems: [] } };
+                                  const healthPrev = prev.healthAndSafety ?? { emergencyContacts: [], safetyAdviceItems: [] };
+                                  const nextList = (healthPrev.emergencyContacts ?? []).map((c, i) =>
+                                    i === cIndex ? { ...c, images: (c.images ?? []).filter((_img, ii) => ii !== imgIndex) } : c
+                                  );
+                                  return {
+                                    ...current,
+                                    guestInfo: {
+                                      ...prev,
+                                      healthAndSafety: { ...healthPrev, emergencyContacts: nextList }
+                                    }
+                                  };
+                                })
+                              }
+                              removeAriaLabel={t("admin.actions.removeImage")}
+                            />
                           ))}
                         </div>
-                      ))}
+                      )}
                     </div>
                     <label className="admin-field">
                       <span>{t("admin.guestInfo.contactMapLabel")}</span>
@@ -5782,7 +5741,7 @@ function AdminPageBody({
                           <span>{t("admin.actions.addLink")}</span>
                         </button>
                       </div>
-                      {((contact.links ?? []).length === 0 ? (
+                      {(contact.links ?? []).length === 0 ? (
                         <p className="muted">{t("admin.guestInfo.noContactLinks")}</p>
                       ) : (
                         (contact.links ?? []).map((link, linkIdx) => (
@@ -5933,7 +5892,7 @@ function AdminPageBody({
                             </label>
                           </div>
                         ))
-                      ))}
+                      )}
                     </div>
                   </div>
                 ) : null)}

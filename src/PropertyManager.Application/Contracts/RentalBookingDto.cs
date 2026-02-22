@@ -29,6 +29,18 @@ public sealed record RentalBookingDto
     public string? Names { get; init; }
 
     /// <summary>
+    /// Guest email address for sending the guest link.
+    /// </summary>
+    [JsonPropertyName("guestEmail")]
+    public string? GuestEmail { get; init; }
+
+    /// <summary>
+    /// Guest phone number (E.164 preferred) for SMS/WhatsApp.
+    /// </summary>
+    [JsonPropertyName("guestPhone")]
+    public string? GuestPhone { get; init; }
+
+    /// <summary>
     /// Booking source (e.g. AirBnb, Vrbo).
     /// </summary>
     public string? Source { get; init; }
@@ -160,4 +172,23 @@ public sealed record RentalBookingDto
     /// Additional comments.
     /// </summary>
     public string? Comments { get; init; }
+
+    /// <summary>
+    /// Indicates whether the guest has completed identity registration.
+    /// </summary>
+    [JsonPropertyName("hasRegistered")]
+    [JsonConverter(typeof(YesNoJsonConverter))]
+    public string? HasRegistered { get; init; }
+
+    /// <summary>
+    /// Identity document image (URL or reference) supplied by the registration process.
+    /// </summary>
+    [JsonPropertyName("registrationImage")]
+    public string? RegistrationImage { get; init; }
+
+    /// <summary>
+    /// Notes supplied by the registration process.
+    /// </summary>
+    [JsonPropertyName("registrationNotes")]
+    public string? RegistrationNotes { get; init; }
 }

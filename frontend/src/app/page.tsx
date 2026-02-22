@@ -90,6 +90,7 @@ export default async function Home({ searchParams }: { searchParams?: SearchPara
   const baseLanguage = getLanguageFromSearchParams(searchParams);
   const property = await tryGetProperty(propertyId, baseLanguage);
   const isGuestSource = searchParams?.source?.toLowerCase() === "guest";
+  const isPropertySource = searchParams?.source?.toLowerCase() === "property";
   const guestBooking = isGuestSource
     ? findGuestBooking(property, searchParams?.bookingId, searchParams?.bookingDate)
     : null;

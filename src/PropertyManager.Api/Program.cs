@@ -31,6 +31,8 @@ builder.Services.AddApplicationServices();
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddHttpClient();
 builder.Services.Configure<FlightLookupOptions>(builder.Configuration.GetSection("Flights"));
+builder.Services.Configure<GuestLinkEmailOptions>(builder.Configuration.GetSection("GuestLinkEmail"));
+builder.Services.Configure<GuestLinkSmsOptions>(builder.Configuration.GetSection("GuestLinkSms"));
 builder.Services.Configure<JsonOptions>(options =>
 {
     options.SerializerOptions.Converters.Add(new LocalizedStringJsonConverter());
@@ -906,6 +908,150 @@ admin.MapGet("/flights/lookup", async (
     })
     .WithName("AdminLookupFlightArrival")
     .WithSummary("Looks up a flight arrival time by flight number.");
+
+admin.MapPost("/send-guest-link/email", async (
+        HttpRequest request,
+        IOptions<GuestLinkEmailOptions> emailOptions,
+        IHttpClientFactory httpClientFactory,
+        ClaimsPrincipal user,
+        CancellationToken cancellationToken) =>
+    {
+        var body = await request.ReadFromJsonAsync<SendGuestLinkEmailRequest>(cancellationToken);
+        if (body?.PropertyId == null || string.IsNullOrWhiteSpace(body.To) || string.IsNullOrWhiteSpace(body.GuestLink))
+        {
+            return Results.BadRequest(new { message = "PropertyId, To (email), and GuestLink are required." });
+        }
+
+        if (!IsAdmin(user) && !IsAgent(user) && !IsPropertyManager(user) && !IsPropertyOwner(user))
+        {
+            return Results.Forbid();
+        }
+        if (!IsAdmin(user) && !HasPropertyAccess(user, body.PropertyId))
+        {
+            return Results.Forbid();
+        }
+
+        var opts = emailOptions.Value;
+        if (string.IsNullOrWhiteSpace(opts.ApiKey) || string.IsNullOrWhiteSpace(opts.FromEmail))
+        {
+            return Results.Json(
+                new { message = "Guest link email service is not configured." },
+                statusCode: StatusCodes.Status501NotImplemented);
+        }
+
+        var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl) ? "https://api.resend.com" : opts.BaseUrl.TrimEnd('/');
+        var fromDisplay = string.IsNullOrWhiteSpace(opts.FromName)
+            ? opts.FromEmail
+            : $"{opts.FromName} <{opts.FromEmail}>";
+        var subject = string.IsNullOrWhiteSpace(body.Subject)
+            ? "Your guest link"
+            : body.Subject;
+        var html = string.IsNullOrWhiteSpace(body.HtmlBody)
+            ? $"<p>Hello{(string.IsNullOrWhiteSpace(body.GuestName) ? "" : $" {body.GuestName}")},</p><p>Your guest link: <a href=\"{Uri.EscapeDataString(body.GuestLink)}\">{body.GuestLink}</a></p>"
+            : body.HtmlBody;
+
+        var payload = new
+        {
+            from = fromDisplay,
+            to = new[] { body.To.Trim() },
+            subject,
+            html
+        };
+
+        var client = httpClientFactory.CreateClient();
+        var req = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/emails");
+        req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", opts.ApiKey);
+        req.Content = JsonContent.Create(payload);
+
+        var response = await client.SendAsync(req, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            return Results.Json(
+                new
+                {
+                    message = "Email provider did not accept the request.",
+                    status = (int)response.StatusCode,
+                    details = string.IsNullOrWhiteSpace(errorBody) ? null : errorBody
+                },
+                statusCode: StatusCodes.Status502BadGateway);
+        }
+
+        var res = await response.Content.ReadFromJsonAsync<JsonElement>(cancellationToken);
+        var id = res.TryGetProperty("id", out var idEl) ? idEl.GetString() : null;
+        return Results.Ok(new { success = true, id });
+    })
+    .WithName("AdminSendGuestLinkEmail")
+    .WithSummary("Sends the guest link via email.");
+
+admin.MapPost("/send-guest-link/sms", async (
+        HttpRequest request,
+        IOptions<GuestLinkSmsOptions> smsOptions,
+        IHttpClientFactory httpClientFactory,
+        ClaimsPrincipal user,
+        CancellationToken cancellationToken) =>
+    {
+        var body = await request.ReadFromJsonAsync<SendGuestLinkSmsRequest>(cancellationToken);
+        if (body?.PropertyId == null || string.IsNullOrWhiteSpace(body.To) || string.IsNullOrWhiteSpace(body.GuestLink))
+        {
+            return Results.BadRequest(new { message = "PropertyId, To (phone), and GuestLink are required." });
+        }
+
+        if (!IsAdmin(user) && !IsAgent(user) && !IsPropertyManager(user) && !IsPropertyOwner(user))
+        {
+            return Results.Forbid();
+        }
+        if (!IsAdmin(user) && !HasPropertyAccess(user, body.PropertyId))
+        {
+            return Results.Forbid();
+        }
+
+        var opts = smsOptions.Value;
+        if (string.IsNullOrWhiteSpace(opts.AccountSid) || string.IsNullOrWhiteSpace(opts.AuthToken) || string.IsNullOrWhiteSpace(opts.FromNumber))
+        {
+            return Results.Json(
+                new { message = "Guest link SMS service is not configured." },
+                statusCode: StatusCodes.Status501NotImplemented);
+        }
+
+        var baseUrl = string.IsNullOrWhiteSpace(opts.BaseUrl)
+            ? "https://api.twilio.com/2010-04-01"
+            : opts.BaseUrl.TrimEnd('/');
+        var url = $"{baseUrl}/Accounts/{opts.AccountSid}/Messages.json";
+
+        var form = new Dictionary<string, string>
+        {
+            ["To"] = body.To.Trim(),
+            ["From"] = opts.FromNumber,
+            ["Body"] = string.IsNullOrWhiteSpace(body.Message)
+                ? $"Your guest link: {body.GuestLink}"
+                : body.Message
+        };
+
+        var client = httpClientFactory.CreateClient();
+        var auth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{opts.AccountSid}:{opts.AuthToken}"));
+        var req = new HttpRequestMessage(HttpMethod.Post, url);
+        req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", auth);
+        req.Content = new FormUrlEncodedContent(form);
+
+        var response = await client.SendAsync(req, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorBody = await response.Content.ReadAsStringAsync(cancellationToken);
+            return Results.Json(
+                new
+                {
+                    message = "SMS provider did not accept the request.",
+                    status = (int)response.StatusCode,
+                    details = string.IsNullOrWhiteSpace(errorBody) ? null : errorBody
+                },
+                statusCode: StatusCodes.Status502BadGateway);
+        }
+
+        return Results.Ok(new { success = true });
+    })
+    .WithName("AdminSendGuestLinkSms")
+    .WithSummary("Sends the guest link via SMS.");
 
 var themes = api.MapGroup("/themes").RequireAuthorization();
 themes.MapGet("", async (

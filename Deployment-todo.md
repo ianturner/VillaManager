@@ -196,6 +196,54 @@ Copy the output - NSvcy8cszHinIO+PXayFOwhihOC5aPx/wDl6SCvqbkc= — you'll use it
 4. Click **Apply** at the bottom of the list
 5. Click **Confirm** if prompted at the top about restarting the app
 
+### Step B3a: (Optional) Guest Link Email and SMS
+
+VillaManager can send the guest link to guests via email (Resend) and/or SMS (Twilio). These are optional; if not configured, the "Email guest link" and "Send guest link" buttons will show a "service not configured" message.
+
+#### Acquiring API keys
+
+**Resend (email)**
+
+1. Go to [resend.com](https://resend.com) and sign up for a free account.
+2. In the dashboard, go to **API Keys**.
+3. Click **Create API Key** and give it a name (e.g. "Production" or "VillaManager").
+4. Copy the key immediately (it starts with `re_`). You will not be able to see it again; if lost, create a new key.
+5. Add and verify your domain under **Domains** so you can send from `noreply@yourdomain.com` (or similar). Until you verify a domain, you can send from Resend's test domain to your own email address only.
+
+**Twilio (SMS)**
+
+1. Go to [twilio.com](https://www.twilio.com) and sign up for an account.
+2. In the Twilio Console dashboard, find:
+   - **Account SID** (starts with `AC`)
+   - **Auth Token** (click "Show" to reveal)
+3. Buy a phone number: go to **Phone Numbers** → **Manage** → **Buy a number**. Choose one with SMS capability. Trial accounts can send only to verified phone numbers.
+4. Use the full E.164 format for `FromNumber` (e.g. `+441234567890`).
+
+#### Adding the keys to your deployment
+
+**Azure App Service:** Add these to **Configuration** → **App settings**:
+
+| Name | Value | Notes |
+|------|-------|-------|
+| `GuestLinkEmail__ApiKey` | `re_...` | Your Resend API key |
+| `GuestLinkEmail__FromEmail` | `noreply@yourdomain.com` | Must be verified in Resend |
+| `GuestLinkEmail__FromName` | `Your Property` | Sender display name (optional) |
+| `GuestLinkSms__AccountSid` | `AC...` | Your Twilio Account SID |
+| `GuestLinkSms__AuthToken` | `...` | Your Twilio Auth Token |
+| `GuestLinkSms__FromNumber` | `+441234567890` | Your Twilio phone number (E.164) |
+
+**Local development:** Use .NET User Secrets so keys are never committed:
+
+```bash
+cd src/PropertyManager.Api
+dotnet user-secrets set "GuestLinkEmail:ApiKey" "re_your_key_here"
+dotnet user-secrets set "GuestLinkEmail:FromEmail" "noreply@yourdomain.com"
+dotnet user-secrets set "GuestLinkEmail:FromName" "Your Property"
+dotnet user-secrets set "GuestLinkSms:AccountSid" "AC..."
+dotnet user-secrets set "GuestLinkSms:AuthToken" "your_auth_token"
+dotnet user-secrets set "GuestLinkSms:FromNumber" "+441234567890"
+```
+
 ### Step B4: Mount the Azure File Share
 
 1. In your App Service, click **Configuration** → **Path mappings** (or **Advanced tools** → **Go** → **SSH** for manual checks)
