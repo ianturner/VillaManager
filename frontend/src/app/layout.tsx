@@ -6,8 +6,8 @@ import "./globals.css";
 config.autoAddCss = false;
 
 export const metadata = {
-  title: "VillaManager Prototype",
-  description: "Property page prototype"
+  title: "MiaCasa Studios",
+  description: "Property Manager"
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
