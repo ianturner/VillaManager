@@ -24,12 +24,35 @@ export default function PropertyPageNav({
     return null;
   }
 
+  const selectedPage = pages.find((p) => p.id === selectedId);
+  const showSubmenu =
+    selectedPage?.showSectionsSubmenu && (selectedPage.sections?.length ?? 0) > 0;
+
+  const renderSubmenu = (page: (typeof pages)[0]) => (
+    <ul className="nav-sublist nav-sublist-inline" role="list">
+      {page.sections?.map((section) => (
+        <li key={section.id}>
+          <button
+            type="button"
+            className={`nav-subitem${
+              selectedSectionId === section.id ? " nav-subitem-active" : ""
+            }`}
+            onClick={() => onSelectSection?.(page.id, section.id)}
+          >
+            {section.title}
+          </button>
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
     <nav className="card sticky-nav">
       <ul className="nav-list">
         {pages.map((page) => {
           const isSelected = selectedId === page.id;
-          const showSubmenu = isSelected && page.showSectionsSubmenu && (page.sections?.length ?? 0) > 0;
+          const showInlineSubmenu =
+            isSelected && page.showSectionsSubmenu && (page.sections?.length ?? 0) > 0;
           return (
             <li key={page.id} className="nav-item">
               <button
@@ -39,27 +62,31 @@ export default function PropertyPageNav({
               >
                 {page.title}
               </button>
-              {showSubmenu ? (
-                <ul className="nav-sublist">
-                  {page.sections?.map((section) => (
-                    <li key={section.id}>
-                      <button
-                        type="button"
-                        className={`nav-subitem${
-                          selectedSectionId === section.id ? " nav-subitem-active" : ""
-                        }`}
-                        onClick={() => onSelectSection?.(page.id, section.id)}
-                      >
-                        {section.title}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
+              {showInlineSubmenu ? renderSubmenu(page) : null}
             </li>
           );
         })}
       </ul>
+      {showSubmenu ? (
+        <div className="nav-submenu-container">
+          <hr className="nav-submenu-divider" aria-hidden="true" />
+          <ul className="nav-sublist nav-sublist-mobile" role="list">
+            {selectedPage?.sections?.map((section) => (
+              <li key={section.id}>
+                <button
+                  type="button"
+                  className={`nav-subitem${
+                    selectedSectionId === section.id ? " nav-subitem-active" : ""
+                  }`}
+                  onClick={() => onSelectSection?.(selectedPage.id, section.id)}
+                >
+                  {section.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </nav>
   );
 }

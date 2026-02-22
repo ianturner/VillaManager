@@ -130,7 +130,19 @@ export default function PropertyPageViewer({ property, onOpenGalleryReady }: Pro
   const [viewerIndex, setViewerIndex] = useState(0);
   const [viewerTitle, setViewerTitle] = useState("");
   const contentCardRef = useRef<HTMLDivElement | null>(null);
+  const viewerContentRef = useRef<HTMLDivElement | null>(null);
   const shouldScrollRef = useRef(false);
+
+  const handleViewerImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    const { naturalWidth, naturalHeight } = img;
+    if (naturalWidth > 0 && naturalHeight > 0 && viewerContentRef.current) {
+      viewerContentRef.current.style.setProperty(
+        "--img-aspect-ratio",
+        String(naturalWidth / naturalHeight)
+      );
+    }
+  }, []);
 
   const facilityGroups = property.facilities;
 
@@ -195,6 +207,12 @@ export default function PropertyPageViewer({ property, onOpenGalleryReady }: Pro
   useEffect(() => {
     onOpenGalleryReady?.(openGallery);
   }, [onOpenGalleryReady, openGallery]);
+
+  useEffect(() => {
+    if (viewerContentRef.current && isViewerOpen) {
+      viewerContentRef.current.style.removeProperty("--img-aspect-ratio");
+    }
+  }, [viewerIndex, isViewerOpen]);
 
   const sortByDistance = (items: NonNullable<typeof places>["items"]) =>
     [...items].sort((left, right) => {
@@ -483,7 +501,7 @@ export default function PropertyPageViewer({ property, onOpenGalleryReady }: Pro
               setViewerTitle("");
             }}
           />
-          <div className="image-viewer-content">
+          <div className="image-viewer-content" ref={viewerContentRef}>
             <button
               type="button"
               className="image-viewer-close"
@@ -526,6 +544,7 @@ export default function PropertyPageViewer({ property, onOpenGalleryReady }: Pro
                 <img
                   src={resolveImageUrl(property.id, viewerImages[viewerIndex]?.src ?? "")}
                   alt={resolveLocalizedText(viewerImages[viewerIndex]?.alt ?? "", language)}
+                  onLoad={handleViewerImageLoad}
                 />
                 {viewerImages[viewerIndex]?.alt ? (
                   <p className="image-viewer-caption">

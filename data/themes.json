@@ -18,8 +18,8 @@
     },
     "Dark": {
       "Background": "#36393a",
-      "Surface": "#495255",
-      "Text": "#f9fafb",
+      "Surface": "#404344",
+      "Text": "#d3d4d4",
       "Muted": "#9ca3af",
       "Primary": "#1d9537",
       "Accent": "#38bdf8",
@@ -29,10 +29,10 @@
     },
     "Fonts": {
       "Base": {
-        "Family": "Calibri",
-        "Src": "/fonts/Calibri.ttf",
+        "Family": "Calibril",
+        "Src": "/fonts/Calibril.ttf",
         "Format": "truetype",
-        "Weight": "normal",
+        "Weight": "100",
         "Style": "normal"
       },
       "Title": {
@@ -67,7 +67,7 @@
       "H6": "none"
     },
     "BodyTextSize": "16px",
-    "CornerRadius": "20px"
+    "CornerRadius": "12px"
   },
   {
     "Name": "casa-sanguinazzo",
